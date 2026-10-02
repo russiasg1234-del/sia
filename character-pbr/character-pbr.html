@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Barry Burton — Character PBR</title>
+<style>
+*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#819ab0;font-family:Arial,sans-serif}
+canvas{display:block;touch-action:none}
+#caption{position:fixed;bottom:20px;left:24px;color:white;text-shadow:0 2px 8px #0008;pointer-events:none;z-index:2}
+#caption b{font-size:20px}#caption small{display:block;margin-top:8px}
+#error{display:none;position:fixed;left:20px;top:20px;padding:18px;background:#fff;color:#982929;z-index:10;max-width:440px}
+.dg.ac{z-index:4!important}.dg.main{margin-right:16px!important}
+@media(max-width:600px){.dg.main{width:250px!important}#caption{left:16px;bottom:16px}}
+</style>
+</head>
+<body>
+<div id="caption"><b>BARRY BURTON · CHARACTER PBR</b><small>ลากเมาส์เพื่อหมุนมุมมอง · เลื่อนลูกกลิ้งเพื่อซูม · คลิกขวาเพื่อเลื่อนกล้อง</small></div>
+<div id="error" role="alert"></div>
+<script>
+window.addEventListener('error',function(e){var box=document.getElementById('error');if(box){box.style.display='block';box.textContent='ไม่สามารถเปิดฉากได้: '+e.message;}});
+</script>
+<script src="vendor/three.min.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script src="vendor/GLTFLoader.js"></script>
+<script src="vendor/dat.gui.min.js"></script>
+<script src="character-data.js"></script>
+<script src="myhelmet-app.js"></script>
+</body>
+</html>
