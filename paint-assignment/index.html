@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Paint — Assignment 2</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef0f4;color:#263244;font:15px system-ui,sans-serif}header{padding:18px 24px;background:#fff;border-bottom:1px solid #dce1e8;display:flex;justify-content:space-between;align-items:center;gap:15px}h1{font-size:23px;margin:0}header small{color:#718094}.app{padding:18px;max-width:1400px;margin:auto}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:9px;padding:14px;background:#fff;border:1px solid #dce1e8;border-radius:10px;margin-bottom:14px}button{font:inherit;border:1px solid #d4dce7;border-radius:6px;background:#fff;color:#263244;padding:8px 12px;cursor:pointer}button:hover{background:#edf3fd}button.active{color:#fff;background:#2563eb;border-color:#2563eb}button:disabled{opacity:.4;cursor:default}.divider{width:1px;height:30px;background:#dce1e8;margin:0 4px}label{display:flex;align-items:center;gap:8px}input[type=color]{width:40px;height:35px;padding:2px;border:1px solid #d4dce7;background:white;border-radius:5px}input[type=range]{width:110px;accent-color:#2563eb}output{min-width:40px;font-size:13px;font-variant-numeric:tabular-nums}.palette{display:flex;gap:5px}.swatch{width:24px;height:24px;padding:0;border:1px solid #aaa;border-radius:4px}.paper{overflow:auto;background:#dce2eb;border:1px solid #cbd4df;border-radius:10px;padding:20px;max-height:72vh}canvas{display:block;background:white;box-shadow:0 4px 16px #28344625;touch-action:none;cursor:crosshair}footer{margin-top:12px;display:flex;justify-content:space-between;gap:12px;color:#66758a;font-size:13px}#status{color:#2563eb}@media(max-width:600px){header{padding:14px}header small{display:none}.app{padding:10px}.paper{padding:10px}.divider{display:none}.palette{flex-wrap:wrap}footer{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<header><span>วาดได้ในแบบของคุณ</span></header>
+<main class="app">
+<section class="toolbar" aria-label="เครื่องมือวาดภาพ">
+<button type="button" data-tool="pencil" class="active" aria-pressed="true">✎ ดินสอ</button>
+<button type="button" data-tool="line" aria-pressed="false">╱ เส้นตรง</button>
+<button type="button" data-tool="rect" aria-pressed="false">□ สี่เหลี่ยม</button>
+<button type="button" data-tool="ellipse" aria-pressed="false">○ วงรี / วงกลม</button>
+<button type="button" data-tool="eraser" aria-pressed="false">▱ ยางลบ</button>
+<span class="divider"></span>
+<label>สี <input id="color" type="color" value="#263244" aria-label="เลือกสีเส้น"></label>
+<label>ความหนา <input id="width" type="range" min="1" max="50" value="4" aria-label="ความหนาเส้น"><output id="width-value">4 px</output></label>
+<label><input id="fill" type="checkbox">ระบายรูปทรง</label>
+<div class="palette" aria-label="ชุดสี"></div>
+<span class="divider"></span>
+<button id="undo" type="button" disabled>ย้อนกลับ</button><button id="redo" type="button" disabled>ทำซ้ำ</button>
+<button id="clear" type="button">ล้างภาพ</button><button id="save" type="button">บันทึก PNG</button>
+</section>
+<div class="paper"><canvas id="canvas" width="1100" height="650" aria-label="กระดาษวาดภาพ" tabindex="0"></canvas></div>
+<footer><span id="status" role="status">เครื่องมือ: ดินสอ</span><span>กด Shift เพื่อวาดวงกลมหรือสี่เหลี่ยมจัตุรัส · Ctrl+Z ย้อนกลับ</span></footer>
+</main>
+<script>
+'use strict';
+const canvas=document.querySelector('#canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true});
+const colorInput=document.querySelector('#color'),widthInput=document.querySelector('#width'),fillInput=document.querySelector('#fill');
+const names={pencil:'ดินสอ',line:'เส้นตรง',rect:'สี่เหลี่ยม',ellipse:'วงรี / วงกลม',eraser:'ยางลบ'};
+let tool='pencil',drawing=false,start=null,last=null,snapshot=null,stroke=null;
+let history=[ctx.getImageData(0,0,canvas.width,canvas.height)],historyIndex=0;
+function updateButtons(){document.querySelector('#undo').disabled=historyIndex===0;document.querySelector('#redo').disabled=historyIndex===history.length-1;}
+function commit(){history=history.slice(0,historyIndex+1);history.push(ctx.getImageData(0,0,canvas.width,canvas.height));if(history.length>25)history.shift();historyIndex=history.length-1;updateButtons();}
+function restore(){ctx.putImageData(history[historyIndex],0,0);updateButtons();}
+document.querySelectorAll('[data-tool]').forEach(button=>button.addEventListener('click',()=>{tool=button.dataset.tool;document.querySelectorAll('[data-tool]').forEach(b=>{const chosen=b===button;b.classList.toggle('active',chosen);b.setAttribute('aria-pressed',chosen);});document.querySelector('#status').textContent='เครื่องมือ: '+names[tool];canvas.style.cursor=tool==='eraser'?'cell':'crosshair';}));
+widthInput.addEventListener('input',()=>document.querySelector('#width-value').textContent=widthInput.value+' px');
+['#263244','#ffffff','#ef4444','#f97316','#facc15','#22c55e','#06b6d4','#2563eb','#a855f7'].forEach(color=>{const b=document.createElement('button');b.type='button';b.className='swatch';b.style.background=color;b.setAttribute('aria-label','เลือกสี '+color);b.addEventListener('click',()=>colorInput.value=color);document.querySelector('.palette').appendChild(b);});
+function point(event){const r=canvas.getBoundingClientRect();return{x:(event.clientX-r.left)*canvas.width/r.width,y:(event.clientY-r.top)*canvas.height/r.height};}
+function configure(){ctx.globalCompositeOperation=stroke.tool==='eraser'?'destination-out':'source-over';ctx.lineWidth=stroke.width;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=stroke.color;ctx.fillStyle=stroke.color;}
+function dot(p){configure();ctx.beginPath();ctx.arc(p.x,p.y,stroke.width/2,0,Math.PI*2);ctx.fill();}
+function segment(a,b){configure();ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+function shape(p,shift){ctx.putImageData(snapshot,0,0);configure();let dx=p.x-start.x,dy=p.y-start.y;if(shift&&stroke.tool!=='line'){const side=Math.max(Math.abs(dx),Math.abs(dy));dx=(dx<0?-1:1)*side;dy=(dy<0?-1:1)*side;}ctx.beginPath();if(stroke.tool==='line'){ctx.moveTo(start.x,start.y);ctx.lineTo(p.x,p.y);}else if(stroke.tool==='rect'){ctx.rect(start.x,start.y,dx,dy);}else{ctx.ellipse(start.x+dx/2,start.y+dy/2,Math.abs(dx)/2,Math.abs(dy)/2,0,0,Math.PI*2);}if(stroke.fill&&stroke.tool!=='line')ctx.fill();ctx.stroke();}
+canvas.addEventListener('pointerdown',event=>{if(drawing||event.button!==0)return;event.preventDefault();canvas.focus({preventScroll:true});drawing=true;start=last=point(event);snapshot=ctx.getImageData(0,0,canvas.width,canvas.height);stroke={tool,color:colorInput.value,width:Number(widthInput.value),fill:fillInput.checked};canvas.setPointerCapture(event.pointerId);if(stroke.tool==='pencil'||stroke.tool==='eraser')dot(start);});
+canvas.addEventListener('pointermove',event=>{if(!drawing)return;const p=point(event);if(stroke.tool==='pencil'||stroke.tool==='eraser'){segment(last,p);last=p;}else shape(p,event.shiftKey);});
+canvas.addEventListener('pointerup',event=>{if(!drawing)return;const p=point(event);if(stroke.tool==='pencil'||stroke.tool==='eraser')segment(last,p);else shape(p,event.shiftKey);drawing=false;ctx.globalCompositeOperation='source-over';commit();});
+canvas.addEventListener('pointercancel',()=>{if(drawing){ctx.putImageData(snapshot,0,0);drawing=false;ctx.globalCompositeOperation='source-over';}});
+function undo(){if(!drawing&&historyIndex>0){historyIndex--;restore();}}
+function redo(){if(!drawing&&historyIndex<history.length-1){historyIndex++;restore();}}
+document.querySelector('#undo').addEventListener('click',undo);document.querySelector('#redo').addEventListener('click',redo);
+document.querySelector('#clear').addEventListener('click',()=>{if(drawing)return;if(confirm('ล้างภาพทั้งหมด? สามารถกดย้อนกลับเพื่อคืนภาพได้')){ctx.clearRect(0,0,canvas.width,canvas.height);commit();}});
+document.querySelector('#save').addEventListener('click',()=>{const exportCanvas=document.createElement('canvas');exportCanvas.width=canvas.width;exportCanvas.height=canvas.height;const out=exportCanvas.getContext('2d');out.fillStyle='#fff';out.fillRect(0,0,canvas.width,canvas.height);out.drawImage(canvas,0,0);exportCanvas.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='my-paint.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);},'image/png');});
+addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='z'){event.preventDefault();event.shiftKey?redo():undo();}else if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='y'){event.preventDefault();redo();}});
+</script>
+</body>
+</html>
