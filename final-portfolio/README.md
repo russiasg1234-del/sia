@@ -14,11 +14,13 @@
 - Cel shading: หุ่นสร้างเองใช้ MeshToonMaterial + gradient map 4 ระดับ NearestFilter + inverted-hull outline; Barry สลับ PBR/Cel ได้และคืนวัสดุต้นฉบับได้
 - Vertex shader: ธง grid 40 × 24 ขยับ vertex ตาม uniform เวลา มีขอบบนตรึงและปรับแรงลม/หยุดได้ รองรับ prefers-reduced-motion
 - Picking: Raycaster บน mesh จริง 6 จุด — โปรไฟล์, จอ, รถ, Barry, หุ่น, ธง; มีเมนูคีย์บอร์ดสำรอง แยกคลิก/ลากกล้อง
-- ผลงานจริงยังรอข้อมูลจากผู้ใช้ มีช่องว่าง 3 ช่อง ไม่ควรถือว่า Final ส่งครบจนกว่าจะใส่เนื้อหานี้และตรวจภาพจริง
+- ผลงานจริงครบ 3 ลิงก์ที่ผู้ใช้ส่ง: Electrode (Desmos), My Paint (Assignment 2), Barry Burton (Character PBR) คลิกจอคอม/เมนูผลงานเพื่อเปิดการ์ดและลิงก์ในแท็บใหม่
 
 ## ไฟล์
 
 `garage-progress.js` เป็นฐาน geometry ที่ทำไว้ก่อนหน้า `garage-final.js` ปรับ palette และเพิ่มส่วน Final `viewer.js` จัดแสง โมเดล กล้องและ interaction
+
+`projects-data.js` เก็บชื่อ คำอธิบาย เครื่องมือ และลิงก์ของผลงานทั้งสาม การเปิดฉากในเครื่องไม่ต้องใช้อินเทอร์เน็ต แต่ลิงก์ผลงานไปเว็บไซต์จริงต้องเชื่อมต่ออินเทอร์เน็ต
 
 `index-progress.html` + `viewer-progress.js` เก็บเวอร์ชันก่อนหน้าไว้เปิดดูได้ ไม่ได้ลบงานเดิม
 

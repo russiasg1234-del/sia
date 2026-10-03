@@ -58,9 +58,18 @@ function createDarkGarage(THREE) {
   }
   const rows=[['สิทธิศักดิ์ บุษบก',1.75],['6621650469',1.32],['สาขา วิทยาการคอมพิวเตอร์',2.09],['คณะ ศิลปศาสตร์และวิทยาศาสตร์',2.14],['มหาวิทยาลัยเกษตรศาสตร์',2.06]];
   rows.forEach((r,i)=>text3D(r[0],r[1],[.2,2.49-i*.23,-3.727]));
-  find('Portfolio screen').userData={action:'projects',label:'Portfolio / ช่องผลงาน'};
-  find('Monitor frame').userData={action:'projects',label:'Portfolio / ช่องผลงาน'};
+  find('Portfolio screen').userData={action:'projects',label:'Portfolio / ผลงาน 3 ชิ้น'};
+  find('Monitor frame').userData={action:'projects',label:'Portfolio / ผลงาน 3 ชิ้น'};
   const screen=find('Portfolio screen').material;
+  if(typeof document!=='undefined'){
+    const c=document.createElement('canvas');c.width=768;c.height=448;const ctx=c.getContext('2d');
+    ctx.fillStyle='#101c29';ctx.fillRect(0,0,768,448);
+    ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillStyle='#8de1ee';ctx.font='bold 42px Tahoma,sans-serif';ctx.fillText('SELECTED WORK / 03',42,64);
+    const names=['01 / Electrode — Desmos','02 / My Paint','03 / Character PBR'];
+    ctx.font='30px Tahoma,sans-serif';names.forEach((name,i)=>{ctx.fillStyle='#233345';ctx.fillRect(34,108+i*80,700,62);ctx.fillStyle='#e0eef7';ctx.fillText(name,52,139+i*80);});
+    ctx.fillStyle='#8de1ee';ctx.font='24px Tahoma,sans-serif';ctx.fillText('CLICK TO EXPLORE  >',42,403);
+    screen.map.dispose();screen.map=new THREE.CanvasTexture(c);screen.map.encoding=THREE.sRGBEncoding;screen.needsUpdate=true;
+  }
   screen.color.setHex(0xffffff);screen.emissive.setHex(0xffffff);
   screen.emissiveMap=screen.map;screen.emissiveIntensity=.55;
   const garageSign=find('Garage sign').material;
