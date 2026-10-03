@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Garage Studio — Portfolio in progress</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef0f1;font:14px system-ui,sans-serif;color:#33404a;overflow:hidden}canvas{display:block;touch-action:none}.panel{position:fixed;z-index:2;left:20px;top:20px;width:260px;background:#ffffffed;border:1px solid #d5dce1;border-radius:10px;padding:16px;box-shadow:0 6px 24px #30405010}h1{font-size:18px;margin:0 0 8px}.sub{font-size:12px;color:#78838d;margin:0 0 12px}.buttons{display:flex;gap:6px;flex-wrap:wrap}button{border:1px solid #d3dbe1;background:#fff;padding:8px 10px;border-radius:5px;color:inherit;font:inherit;cursor:pointer}button:hover{background:#eef3f8}ol{margin:14px 0 0;padding-left:22px;font-size:12px;line-height:1.85}.hint{position:fixed;bottom:18px;left:20px;z-index:2;background:#ffffffdd;padding:9px 12px;border:1px solid #d5dce1;border-radius:6px;font-size:12px}.error{position:fixed;left:20px;bottom:75px;color:#9e2222;background:white;padding:14px;display:none;z-index:3}@media(max-width:650px){.panel{left:10px;top:10px;width:230px;padding:12px}ol{display:none}.hint{left:10px;right:10px;font-size:11px}h1{font-size:16px}}
+</style>
+</head>
+<body>
+<aside class="panel">
+<h1>Garage Studio</h1>
+<p class="sub">3D Portfolio · 8 × 8 หน่วย · ระหว่างพัฒนา</p>
+<div class="buttons"><button id="home">มุมเริ่มต้น</button><button id="top">มุมบน</button><button id="labels">แสดงป้าย</button></div>
+<ol><li>McLaren F1 GTR Longtail</li><li>พื้นคอนกรีตและประตูโรงรถ</li><li>โต๊ะช่าง คอมฯ และชั้นเครื่องมือ</li><li>พื้นที่รูปและข้อมูลโปรไฟล์</li><li>Barry Burton ข้างรถ</li></ol>
+<p class="sub" style="margin:12px 0 0"><a href="credits.html" target="_blank" rel="noopener" style="color:inherit">เครดิตโมเดล</a></p>
+</aside>
+<div class="hint">ลากเพื่อหมุน · เลื่อนลูกกลิ้งเพื่อซูม · คลิกขวาลากเพื่อเลื่อนกล้อง</div>
+<div id="error" class="error" role="alert"></div>
+<script>addEventListener('error',function(e){var box=document.querySelector('#error');box.style.display='block';box.textContent='เปิดฉากไม่สำเร็จ: '+e.message;});</script>
+<script src="vendor/three.min.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script src="vendor/GLTFLoader.js"></script>
+<script src="barry-data.js"></script>
+<script src="mclaren-data.js"></script>
+<script src="garage-progress.js"></script>
+<script src="viewer-progress.js"></script>
+</body>
+</html>

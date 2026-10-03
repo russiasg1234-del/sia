@@ -3,28 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Garage Studio — Portfolio in progress</title>
+<meta name="theme-color" content="#101418">
+<title>Sittisak — Dark Garage Portfolio</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#eef0f1;font:14px system-ui,sans-serif;color:#33404a;overflow:hidden}canvas{display:block;touch-action:none}.panel{position:fixed;z-index:2;left:20px;top:20px;width:260px;background:#ffffffed;border:1px solid #d5dce1;border-radius:10px;padding:16px;box-shadow:0 6px 24px #30405010}h1{font-size:18px;margin:0 0 8px}.sub{font-size:12px;color:#78838d;margin:0 0 12px}.buttons{display:flex;gap:6px;flex-wrap:wrap}button{border:1px solid #d3dbe1;background:#fff;padding:8px 10px;border-radius:5px;color:inherit;font:inherit;cursor:pointer}button:hover{background:#eef3f8}ol{margin:14px 0 0;padding-left:22px;font-size:12px;line-height:1.85}.hint{position:fixed;bottom:18px;left:20px;z-index:2;background:#ffffffdd;padding:9px 12px;border:1px solid #d5dce1;border-radius:6px;font-size:12px}.error{position:fixed;left:20px;bottom:75px;color:#9e2222;background:white;padding:14px;display:none;z-index:3}@media(max-width:650px){.panel{left:10px;top:10px;width:230px;padding:12px}ol{display:none}.hint{left:10px;right:10px;font-size:11px}h1{font-size:16px}}
+:root{color-scheme:dark;--bg:#101418;--panel:#151b22ed;--line:#36414d;--text:#edf2f7;--muted:#a2afbd;--accent:#8de1ee}*{box-sizing:border-box}body{margin:0;background:var(--bg);font:14px system-ui,Tahoma,sans-serif;color:var(--text);overflow:hidden}canvas{display:block;touch-action:none}button,a{-webkit-tap-highlight-color:transparent}button{border:1px solid var(--line);background:#202833;padding:9px 11px;border-radius:7px;color:inherit;font:inherit;cursor:pointer}button:hover{border-color:var(--accent);background:#293743}button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}button[aria-pressed=true]{color:var(--accent);border-color:var(--accent)}a{color:var(--accent)}.panel{position:fixed;z-index:2;left:24px;top:24px;width:265px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;backdrop-filter:blur(15px);box-shadow:0 12px 45px #0005}.eyebrow{font-size:10px;letter-spacing:.22em;color:var(--accent);margin:0 0 9px}h1{font-size:24px;letter-spacing:-.04em;margin:0 0 5px}.sub{font-size:12px;color:var(--muted);line-height:1.7;margin:0 0 16px}.buttons{display:flex;gap:6px;flex-wrap:wrap}.nav{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:14px}.nav button{font-size:12px;text-align:left}.footer{margin:16px 0 0;font-size:11px;color:var(--muted)}.hint{position:fixed;bottom:20px;left:24px;z-index:2;background:var(--panel);padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--muted)}.status{position:fixed;right:24px;top:24px;background:var(--panel);border:1px solid var(--line);padding:10px 14px;border-radius:8px;z-index:2;font-size:11px;color:var(--muted);max-width:260px}.error{position:fixed;left:24px;bottom:85px;color:#ffc2ba;background:#421e24;padding:14px;display:none;z-index:4;max-width:90vw}.tooltip{position:fixed;display:none;z-index:3;pointer-events:none;border:1px solid var(--accent);background:#121b23ed;padding:8px 12px;border-radius:6px;font-size:12px}dialog{color:var(--text);background:#171e27;border:1px solid var(--line);border-radius:16px;padding:26px;width:min(540px,calc(100vw - 32px));max-height:85vh;box-shadow:0 25px 100px #0009}dialog::backdrop{background:#05090cbc;backdrop-filter:blur(6px)}dialog h2{margin:4px 0 18px;font-size:23px}dialog p,dialog li{line-height:1.8;color:#c5d0dc}.close{float:right}dl{display:grid;grid-template-columns:90px 1fr;gap:10px;font-size:13px}dt{color:var(--muted)}dd{margin:0;line-height:1.6}.portrait{width:90px;height:112px;object-fit:cover;border-radius:8px;float:left;margin:0 18px 15px 0}.empty{border:1px dashed #475363;border-radius:9px;padding:16px;margin:10px 0}.empty small{display:block;color:var(--muted);margin-top:5px}.settings{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:15px}input[type=range]{accent-color:var(--accent);max-width:100%}.material-tag{color:var(--accent);font-size:12px}.dialog-clear{clear:both}body.inspecting .panel{opacity:.65}@media(max-width:700px){.panel{left:12px;top:12px;width:220px;padding:14px}h1{font-size:21px}.sub{font-size:11px;margin-bottom:10px}.nav button{padding:8px;font-size:11px}.hint{bottom:12px;left:12px;right:12px;font-size:10px}.status{top:auto;bottom:65px;right:12px;font-size:10px;max-width:190px}.footer{margin-top:10px}.buttons button{font-size:11px}dialog{padding:20px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 </style>
 </head>
 <body>
-<aside class="panel">
-<h1>Garage Studio</h1>
-<p class="sub">3D Portfolio · 8 × 8 หน่วย · ระหว่างพัฒนา</p>
-<div class="buttons"><button id="home">มุมเริ่มต้น</button><button id="top">มุมบน</button><button id="labels">แสดงป้าย</button></div>
-<ol><li>McLaren F1 GTR Longtail</li><li>พื้นคอนกรีตและประตูโรงรถ</li><li>โต๊ะช่าง คอมฯ และชั้นเครื่องมือ</li><li>พื้นที่รูปและข้อมูลโปรไฟล์</li><li>Barry Burton ข้างรถ</li></ol>
-<p class="sub" style="margin:12px 0 0"><a href="credits.html" target="_blank" rel="noopener" style="color:inherit">เครดิตโมเดล</a></p>
+<aside class="panel" aria-label="เมนูโรงรถ">
+<p class="eyebrow">SITTISAK / INTERACTIVE PORTFOLIO</p>
+<h1>Dark Garage.</h1>
+<p class="sub">พื้นที่เล็ก ๆ สำหรับตัวตนและผลงาน<br>โรงรถสร้างเอง · 8 × 8 หน่วย</p>
+<div class="buttons"><button id="home">มุมเริ่มต้น</button><button id="top">มุมบน</button><button id="labels" aria-pressed="false">แสดงป้าย</button></div>
+<nav class="nav" aria-label="สำรวจฉาก">
+<button data-action="profile">01 / โปรไฟล์</button><button data-action="projects">02 / ผลงาน</button>
+<button data-action="car">03 / McLaren PBR</button><button data-action="barry">04 / Barry Burton</button>
+<button data-action="cel">05 / Cel shading</button><button data-action="shader">06 / Vertex shader</button>
+</nav>
+<p class="footer"><a href="credits.html" target="_blank" rel="noopener">เครดิตโมเดล</a> · <a href="checklist.html" target="_blank" rel="noopener">เช็กลิสต์ Final</a></p>
 </aside>
-<div class="hint">ลากเพื่อหมุน · เลื่อนลูกกลิ้งเพื่อซูม · คลิกขวาลากเพื่อเลื่อนกล้อง</div>
+<div class="status" id="status" role="status" aria-live="polite">กำลังเตรียมฉาก 3D…</div>
+<div class="hint">ลากเพื่อหมุน · Scroll / บีบจอเพื่อซูม · คลิกวัตถุเพื่อสำรวจ · Esc ปิดข้อมูล</div>
+<div id="tooltip" class="tooltip"></div>
 <div id="error" class="error" role="alert"></div>
+<dialog id="detail" aria-labelledby="detail-title"><button class="close" id="close-detail" aria-label="ปิดข้อมูล">✕</button><p class="eyebrow" id="detail-kicker"></p><h2 id="detail-title"></h2><div id="detail-body"></div></dialog>
 <script>addEventListener('error',function(e){var box=document.querySelector('#error');box.style.display='block';box.textContent='เปิดฉากไม่สำเร็จ: '+e.message;});</script>
 <script src="vendor/three.min.js"></script>
 <script src="vendor/OrbitControls.js"></script>
 <script src="vendor/GLTFLoader.js"></script>
+<script src="portrait-data.js"></script>
 <script src="barry-data.js"></script>
 <script src="mclaren-data.js"></script>
 <script src="garage-progress.js"></script>
+<script src="garage-final.js"></script>
 <script src="viewer.js"></script>
 </body>
 </html>
