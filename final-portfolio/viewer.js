@@ -16,7 +16,7 @@
   const reflectionCamera=new THREE.CubeCamera(.1,40,reflectionTarget);reflectionCamera.position.set(.5,1.8,.3);reflectionCamera.update(renderer,scene);
   const pmrem=new THREE.PMREMGenerator(renderer),environment=pmrem.fromCubemap(reflectionTarget.texture);scene.environment=environment.texture;pmrem.dispose();reflectionTarget.dispose();
   const models={},originalBarry=new Map();let loaded=0,failed=0,barryToon=false;
-  function report(){status.textContent=failed?'บางโมเดลเปิดไม่สำเร็จ — ดูข้อความด้านล่าง':loaded===2?'พร้อมสำรวจ · คลิกวัตถุที่มีป้าย':'กำลังเตรียมโมเดล '+loaded+'/2';}
+  function report(){status.textContent=failed?'บางโมเดลเปิดไม่สำเร็จ — ดูข้อความด้านล่าง':loaded===2?'พร้อมสำรวจ · คลิกวัตถุเพื่อดูข้อมูล':'กำลังเตรียมโมเดล '+loaded+'/2';}
   function addModel(action,name,base64,fit,position){
     try{
       if(!base64)throw new Error('ไม่พบข้อมูลโมเดล');
@@ -38,14 +38,6 @@
   function home(){camera.position.set(9.5,7.3,11.5);controls.target.set(0,1,.1);controls.update();}
   home();$('#home').addEventListener('click',home);
   $('#top').addEventListener('click',()=>{camera.position.set(0,15,.001);controls.target.set(0,0,0);controls.update();});
-  const labels=new THREE.Group();labels.visible=false;scene.add(labels);
-  garage.labels.forEach(item=>{
-    const canvas=document.createElement('canvas');canvas.width=640;canvas.height=100;const ctx=canvas.getContext('2d');
-    ctx.fillStyle='rgba(17,26,36,.96)';ctx.fillRect(0,0,640,100);ctx.strokeStyle='#7dcbd8';ctx.lineWidth=3;ctx.strokeRect(2,2,636,96);ctx.fillStyle='#dcebf1';ctx.font='30px Tahoma,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(item.text,320,50);
-    const texture=new THREE.CanvasTexture(canvas);texture.encoding=THREE.sRGBEncoding;
-    const label=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,depthTest:false,depthWrite:false}));label.position.set(...item.position);label.scale.set(1.8,.28,1);labels.add(label);
-  });
-  $('#labels').addEventListener('click',event=>{labels.visible=!labels.visible;event.currentTarget.textContent=labels.visible?'ซ่อนป้าย':'แสดงป้าย';event.currentTarget.setAttribute('aria-pressed',String(labels.visible));});
   const dialog=$('#detail');let previousFocus=null;
   const escapeHTML=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const projectsHTML='<p class="project-intro">ผลงานด้านกราฟิก 2D, โปรแกรมวาดภาพ และการแสดงโมเดล 3D</p>'+(window.PORTFOLIO_PROJECTS||[]).map((project,index)=>'<article class="project-card"><div class="project-top"><span class="project-number">0'+(index+1)+'</span><span class="project-category">'+escapeHTML(project.category)+'</span></div><h3>'+escapeHTML(project.title)+'</h3><p>'+escapeHTML(project.description)+'</p><div class="project-tools">'+escapeHTML(project.tools)+'</div><a class="project-link" href="'+escapeHTML(project.url)+'" target="_blank" rel="noopener noreferrer" aria-label="เปิดผลงาน '+escapeHTML(project.title)+' ในแท็บใหม่">เปิดผลงาน ↗</a></article>').join('')+'<p class="project-note">เปิดผลงานในแท็บใหม่ ต้องเชื่อมต่ออินเทอร์เน็ตเพื่อดูเว็บไซต์ปลายทาง</p>';
@@ -54,8 +46,7 @@
     projects:{kicker:'02 / SELECTED WORK',title:'Portfolio / 3 Projects',html:projectsHTML},
     car:{kicker:'03 / PHYSICALLY BASED RENDERING',title:'McLaren F1 GTR Longtail',html:'<p class="material-tag">PBR · Environment reflection · Real-time lighting</p><p>ใช้โมเดล McLaren ที่เตรียมผ่าน Blender ผิวสีรถ โลหะและยางตอบสนองต่อแสงและ environment ของโรงรถ หมุนกล้องเพื่อดูความแตกต่างของผิวแต่ละชนิด</p><p>โมเดลโดย vecarz · CC BY-NC-SA 4.0<br>ส่วนโรงรถและสิ่งปลูกสร้างสร้างเองทั้งหมด</p><a href="credits.html" target="_blank" rel="noopener">ดูเครดิตและเงื่อนไขการใช้โมเดล</a>'},
     barry:{kicker:'04 / CHARACTER',title:'Barry Burton',html:'<p>โมเดลตัวละครเดิมที่คุณเลือก เตรียมเป็น static mesh ผ่าน Blender และวางข้างรถ ท่าทางเป็น T-pose ของโมเดล ไม่ได้เพิ่ม animation เดิน</p><p>สลับดูระหว่างวัสดุ PBR ต้นฉบับและ cel shading ที่ยังเก็บ texture เดิม</p><button id="barry-style" aria-pressed="false">เปลี่ยนเป็น Cel shading</button>'},
-    cel:{kicker:'05 / CEL SHADING',title:'Garage Bot',html:'<p>หุ่นโรงรถสร้างเองจาก geometry ใช้ MeshToonMaterial ร่วมกับ gradient map แบบ 4 ระดับและ NearestFilter จึงเห็นแถบสีของแสงชัดเจน พร้อมเส้นขอบสีดำแบบ inverted hull</p><p>สีไม่ได้ไล่แสงต่อเนื่องแบบวัสดุ PBR ลองสลับ Barry เป็น cel shading เพื่อเปรียบเทียบได้ด้วย</p>'},
-    shader:{kicker:'06 / REAL-TIME VERTEX SHADER',title:'Garage Signal',html:'<p>ธงลายกราฟิกบนผนังซ้ายเป็นระนาบแบ่งย่อย 40 × 24 ช่อง vertex shader ขยับตำแหน่ง vertex ด้วยเวลาแบบ realtime โดยตรึงขอบบนไว้กับคาน</p><div class="settings"><button id="motion-toggle">หยุดการเคลื่อนไหว</button><label for="amplitude">แรงลม <output id="amplitude-value">0.12</output></label><input id="amplitude" type="range" min="0" max="0.20" step="0.01" value="0.12"></div>'}
+    shader:{kicker:'05 / REAL-TIME VERTEX SHADER',title:'Garage Signal',html:'<p>ธงลายกราฟิกบนผนังซ้ายเป็นระนาบแบ่งย่อย 40 × 24 ช่อง vertex shader ขยับตำแหน่ง vertex ด้วยเวลาแบบ realtime โดยตรึงขอบบนไว้กับคาน</p><div class="settings"><button id="motion-toggle">หยุดการเคลื่อนไหว</button><label for="amplitude">แรงลม <output id="amplitude-value">0.12</output></label><input id="amplitude" type="range" min="0" max="0.20" step="0.01" value="0.12"></div>'}
   };
   function showDetail(action){
     const item=content[action];if(!item)return;

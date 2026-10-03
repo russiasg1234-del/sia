@@ -1,4 +1,4 @@
-/* All architecture, text geometry, robot and cloth authored for this project. */
+/* All architecture, text geometry and cloth authored for this project. */
 function createDarkGarage(THREE) {
   const base=createGarageProgress(THREE),room=base.room;
   room.name='Dark Garage Portfolio';room.userData.stage='final';
@@ -80,23 +80,9 @@ function createDarkGarage(THREE) {
   box(rails,'Workbench light strip',[1.8,.02,.025],[2.63,.956,-2.04],accent);
   for(const x of [-3.55,3.55])box(rails,'Front marker light',[.025,1.5,.026],[x,1.15,3.48],accent);
 
-  // Original small garage mascot: quantized lighting using a nearest-filtered ramp.
+  // Retain the quantized lighting ramp for Barry's optional cel-shaded material.
   const ramp=new THREE.DataTexture(new Uint8Array([48,108,180,255]),4,1,THREE.LuminanceFormat);
   ramp.minFilter=ramp.magFilter=THREE.NearestFilter;ramp.generateMipmaps=false;ramp.needsUpdate=true;
-  const toon=new THREE.MeshToonMaterial({color:0x64c6dc,gradientMap:ramp});
-  const toonDark=new THREE.MeshToonMaterial({color:0x34465f,gradientMap:ramp});
-  const eye=new THREE.MeshBasicMaterial({color:0xe8fbff});
-  const robot=group('Original cel-shaded garage robot','cel','หุ่นโรงรถ / Cel shading');robot.position.set(2.85,0,.95);
-  function outlined(name,geo,mat,pos){const m=mesh(robot,name,geo,mat,pos);const outline=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x071019,side:THREE.BackSide}));outline.scale.setScalar(1.055);m.add(outline);return m;}
-  outlined('Robot body',new THREE.BoxGeometry(.4,.43,.26),toon,[0,.61,0]);
-  outlined('Robot head',new THREE.BoxGeometry(.5,.31,.32),toon,[0,1.03,0]);
-  outlined('Robot visor',new THREE.BoxGeometry(.4,.12,.04),toonDark,[0,1.04,.173]);
-  for(const x of [-.105,.105])mesh(robot,'Robot eye',new THREE.SphereGeometry(.032,12,8),eye,[x,1.04,.203]);
-  for(const x of [-.13,.13]){outlined('Robot leg',new THREE.BoxGeometry(.11,.23,.12),toonDark,[x,.28,0]);outlined('Robot foot',new THREE.BoxGeometry(.16,.1,.23),toon,[x,.11,.04]);}
-  for(const x of [-.28,.28])outlined('Robot arm',new THREE.BoxGeometry(.12,.35,.15),toon,[x,.61,0]);
-  outlined('Robot neck',new THREE.CylinderGeometry(.05,.05,.14,12),toonDark,[0,.855,0]);
-  mesh(robot,'Robot antenna',new THREE.CylinderGeometry(.013,.013,.12,8),steel,[.13,1.24,0]);
-  mesh(robot,'Robot signal',new THREE.SphereGeometry(.035,12,8),accent,[.13,1.32,0]);
 
   // GPU animation displaces vertices every frame, with the top edge anchored.
   const shaderUniforms={uTime:{value:0},uAmplitude:{value:.12}};
@@ -107,12 +93,5 @@ function createDarkGarage(THREE) {
   const flag=group('Vertex shader cloth','shader','ธงโรงรถ / Vertex shader');
   mesh(flag,'GPU-deformed cloth',new THREE.PlaneGeometry(1.1,.65,40,24),clothMat,[-3.48,2.76,-1.0]).rotation.y=Math.PI/2;
   box(flag,'Cloth mounting bar',[.035,.045,1.18],[-3.48,3.105,-1],steel);
-  return {room,robot,shaderUniforms,gradientMap:ramp,labels:[
-    {text:'McLaren / PBR',position:[-.95,1.45,.6]},
-    {text:'Portfolio / ผลงาน',position:[2.63,2.1,-2.4]},
-    {text:'โปรไฟล์ / ตัวอักษร 3D',position:[-.3,2.95,-3.65]},
-    {text:'Barry Burton',position:[1.4,2.05,1.6]},
-    {text:'Cel shading',position:[2.85,1.65,.95]},
-    {text:'Vertex shader',position:[-3.4,3.3,-1]},
-  ]};
+  return {room,shaderUniforms,gradientMap:ramp};
 }
