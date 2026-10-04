@@ -11,10 +11,10 @@
 <tr><td>ข้อมูลนักศึกษาเป็น 3D และเนื้อหา portfolio</td><td>ชื่อ รหัส สาขา คณะ มหาวิทยาลัยบนผนังเป็น mesh ตัวอักษรที่มีความหนา คลิกโปรไฟล์อ่านข้อมูลได้ คลิกจอคอมเพื่อดูการ์ดผลงานทั้ง 3 ชิ้นพร้อมคำอธิบายและปุ่มเปิดงาน</td></tr>
 <tr><td>รูปตัวเองเป็น texture</td><td>รูปที่ผู้ใช้ส่งฝังใน <code>portrait-data.js</code> แสดงบนกรอบรูปในฉากและหน้าข้อมูล</td></tr>
 <tr><td>PBR material</td><td>พื้นคอนกรีตและผนังใช้ MeshStandardMaterial มี roughness/bump; โครงเหล็กมี metalness และ environment reflection ไม่จำเป็นต้องใช้รถหรือตัวละคร</td></tr>
-<tr><td>Cel shading — ยังขาด</td><td>Robot และ Barry ถูกนำออกตามคำขอ จึงไม่มีวัตถุที่แสดง cel shading ในฉากนี้ ต้องทำ cel shading กับวัตถุอื่นก่อนส่ง Final</td></tr>
+<tr><td>Cel shading</td><td>กรวยจราจรสีส้มและแถบขาวใช้ MeshToonMaterial กับ gradient map 4 ระดับแบบ nearest ให้แสงเป็นแถบสี โดยไม่ต้องมีโมเดลตัวละคร</td></tr>
 <tr><td>Vertex shader realtime</td><td>ธงบนผนังซ้ายใช้ vertex shader ขยับ vertex ตามเวลา ตรึงขอบบน คลิกธงเพื่อปรับแรงลมและหยุด/เล่น</td></tr>
 <tr><td>คุณภาพภาพและการจัดองค์ประกอบ</td><td>โทนถ่าน/เทาเข้ม ไฟ cyan มุม cutaway, shadow map, ACES tone mapping, PBR environment; ยังต้องตรวจภาพในเบราว์เซอร์จริงก่อนส่ง</td></tr>
-<tr><td>3D Interaction / Picking</td><td>คลิกกรอบรูป จอคอม และธง เปิดข้อมูล ใช้ Raycaster ตรวจ mesh จริง แยกการลากกล้องจากการคลิก มีเมนูสำรองสำหรับคีย์บอร์ด</td></tr>
+<tr><td>3D Interaction / Picking</td><td>คลิกกรอบรูป จอคอม ธง และอุปกรณ์โรงรถ เปิดข้อมูล ใช้ Raycaster ตรวจ mesh จริง แยกการลากกล้องจากการคลิก มีเมนูสำรองสำหรับคีย์บอร์ด</td></tr>
 </tbody></table>
 <h2>ผลงาน</h2>
 <ol>
@@ -22,6 +22,7 @@
 <li><a href="https://russiasg1234-del.github.io/sia/paint-assignment/" target="_blank" rel="noopener noreferrer">My Paint — Assignment 2</a></li>
 <li><a href="https://russiasg1234-del.github.io/sia/character-pbr/" target="_blank" rel="noopener noreferrer">Barry Burton — Character PBR</a></li>
 </ol>
-<p>ทดสอบก่อนส่ง: เปิด <code>index.html</code> โดยตรง → ตรวจรูปและฉาก → คลิกครบ 3 จุด → เปิดผลงานครบ 3 ลิงก์ → ทำ cel shading กับวัตถุอื่น → ปรับแรงลม → ตรวจมุมบนและบนมือถือ → ตรวจ GitHub Pages</p>
+<p>อุปกรณ์ที่เติมในโรงรถสร้างเองแบบเรียบง่ายจากทรงพื้นฐาน: ยางซ้อน กรวย แม่แรง แผ่นนอนซ่อมรถ ถังดับเพลิง และนาฬิกา ชั้นวางยังโล่ง ไม่มีรถหรือตัวละคร</p>
+<p>ทดสอบก่อนส่ง: เปิด <code>index.html</code> โดยตรง → ตรวจรูปและฉาก → คลิกโปรไฟล์/จอ/ธง/อุปกรณ์ → เปิดผลงานครบ 3 ลิงก์ → ตรวจ cel shading บนกรวย → ปรับแรงลม → ตรวจมุมบนและบนมือถือ → ตรวจ GitHub Pages</p>
 <p><a href="credits.html">เครดิตและข้อมูลเวอร์ชันเดิม</a></p>
 </main></body></html>

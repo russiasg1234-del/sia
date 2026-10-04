@@ -79,6 +79,7 @@ function createDarkGarage(THREE) {
   box(rails,'Back light strip',[7.2,.028,.026],[0,3.25,-3.8],accent);
   box(rails,'Workbench light strip',[1.8,.02,.025],[2.63,.956,-2.04],accent);
   for(const x of [-3.55,3.55])box(rails,'Front marker light',[.025,1.5,.026],[x,1.15,3.48],accent);
+  room.add(createGarageProps(THREE));
 
 
   // GPU animation displaces vertices every frame, with the top edge anchored.
