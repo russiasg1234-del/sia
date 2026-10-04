@@ -13,8 +13,8 @@
 - PBR: คอนกรีต/ผนัง roughness และ bump, เหล็ก metalness พร้อม environment ยังคงอยู่
 - Cel shading: ถังดับเพลิงใช้ MeshToonMaterial กับ gradient map 4 ระดับแบบ NearestFilter ไม่จำเป็นต้องมีรถหรือตัวละคร
 - Vertex shader: ธง grid 40 × 24 ขยับ vertex ตาม uniform เวลา มีขอบบนตรึงและปรับแรงลม/หยุดได้ รองรับ prefers-reduced-motion
-- Picking: Raycaster บน mesh จริง — โปรไฟล์, จอ, ธง และสวิตช์ไฟ; อุปกรณ์อื่นเป็นของตกแต่ง มีเมนูคีย์บอร์ดสำรอง แยกคลิก/ลากกล้อง
-- ผลงานจริงครบ 3 ลิงก์ที่ผู้ใช้ส่ง: Electrode (Desmos), My Paint (Assignment 2), Barry Burton (Character PBR) คลิกจอคอม/เมนูผลงานเพื่อเปิดการ์ดและลิงก์ในแท็บใหม่
+- Picking: Raycaster บน mesh จริง — โปรไฟล์, จอ, ธง และสวิตช์ไฟ; อุปกรณ์อื่นเป็นของตกแต่ง แยกคลิก/ลากกล้อง เอาแผงเมนูด้านซ้ายออกแล้ว ใช้คีย์ 1/2/3 เปิดข้อมูล และ L เปิด–ปิดไฟได้
+- ผลงานจริงครบ 3 ลิงก์ที่ผู้ใช้ส่ง: Electrode (Desmos), My Paint (Assignment 2), Barry Burton (Character PBR) คลิกจอคอมหรือกดคีย์ 2 เพื่อเปิดการ์ดและลิงก์ในแท็บใหม่
 
 ## ไฟล์
 

@@ -18,8 +18,8 @@
   status.textContent='พร้อมสำรวจ · คลิกสวิตช์ไฟ กรอบรูป จอ หรือธง';
   const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=2.4;controls.maxDistance=24;controls.maxPolarAngle=Math.PI/2-.02;
   function home(){camera.position.set(9.5,7.3,11.5);controls.target.set(0,1,.1);controls.update();}
-  home();$('#home').addEventListener('click',home);
-  $('#top').addEventListener('click',()=>{camera.position.set(0,15,.001);controls.target.set(0,0,0);controls.update();});
+  home();
+  function top(){camera.position.set(0,15,.001);controls.target.set(0,0,0);controls.update();}
   let lightsOn=true;
   function setLights(on){
     lightsOn=on;
@@ -32,9 +32,7 @@
     garage.switchIndicator.material.emissiveIntensity=on?2:0;
     garage.switchIndicator.material.color.setHex(on?0x90e7f2:0x39454b);
     garage.lightSwitch.userData.label=on?'สวิตช์ไฟโรงรถ / คลิกเพื่อปิด':'สวิตช์ไฟโรงรถ / คลิกเพื่อเปิด';
-    const button=$('#light-toggle');button.textContent=on?'ไฟ: เปิด':'ไฟ: ปิด';button.setAttribute('aria-pressed',String(on));
   }
-  $('#light-toggle').addEventListener('click',()=>setLights(!lightsOn));
   const dialog=$('#detail');let previousFocus=null;
   const escapeHTML=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const projectsHTML='<p class="project-intro">ผลงานด้านกราฟิก 2D, โปรแกรมวาดภาพ และการแสดงโมเดล 3D</p>'+(window.PORTFOLIO_PROJECTS||[]).map((project,index)=>'<article class="project-card"><div class="project-top"><span class="project-number">0'+(index+1)+'</span><span class="project-category">'+escapeHTML(project.category)+'</span></div><h3>'+escapeHTML(project.title)+'</h3><p>'+escapeHTML(project.description)+'</p><div class="project-tools">'+escapeHTML(project.tools)+'</div><a class="project-link" href="'+escapeHTML(project.url)+'" target="_blank" rel="noopener noreferrer" aria-label="เปิดผลงาน '+escapeHTML(project.title)+' ในแท็บใหม่">เปิดผลงาน ↗</a></article>').join('')+'<p class="project-note">เปิดผลงานในแท็บใหม่ ต้องเชื่อมต่ออินเทอร์เน็ตเพื่อดูเว็บไซต์ปลายทาง</p>';
@@ -51,7 +49,12 @@
     if(!dialog.open)dialog.showModal();document.body.classList.add('inspecting');controls.enabled=false;$('#tooltip').style.display='none';
   }
   $('#close-detail').addEventListener('click',()=>dialog.close());dialog.addEventListener('close',()=>{document.body.classList.remove('inspecting');controls.enabled=true;if(previousFocus&&previousFocus.focus)previousFocus.focus();});
-  document.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',()=>showDetail(button.dataset.action)));
+  addEventListener('keydown',event=>{
+    if(dialog.open||/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||''))return;
+    const key=event.key.toLowerCase();
+    if(key==='1')showDetail('profile');else if(key==='2')showDetail('projects');else if(key==='3')showDetail('shader');
+    else if(key==='l')setLights(!lightsOn);else if(key==='h')home();else if(key==='t')top();
+  });
   // Raycast real meshes, then resolve their interactive ancestor.
   const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2(),tooltip=$('#tooltip');let pointerStart=null;
   function pick(event){const rect=renderer.domElement.getBoundingClientRect();pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);const hit=raycaster.intersectObjects(garage.room.children,true)[0];if(!hit)return null;let object=hit.object;while(object){if(object.userData.action)return object;object=object.parent;}return null;}
@@ -64,5 +67,5 @@
   addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
   renderer.setAnimationLoop(()=>{const dt=Math.min(clock.getDelta(),.05);if(motion)shaderTime+=dt;garage.shaderUniforms.uTime.value=shaderTime;controls.update();renderer.render(scene,camera);});
   // Diagnostics for geometry and interaction tests; not required by the UI.
-  window.GARAGE_DEBUG={scene,garage,camera,renderer,controls,showDetail,pick,home,setLights};
+  window.GARAGE_DEBUG={scene,garage,camera,renderer,controls,showDetail,pick,home,top,setLights};
 })();

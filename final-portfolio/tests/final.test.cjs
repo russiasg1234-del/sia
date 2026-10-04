@@ -3,19 +3,18 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),asse
 const root=path.resolve(__dirname,'..'),read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const html=read('index.html');
 for(const match of html.matchAll(/(?:src|href)="([^"#]+)"/g)){if(!/^(https?:|data:)/.test(match[1]))assert(fs.existsSync(path.join(root,match[1])),match[1]);}
-const elements=new Map(),nav=[];
+const elements=new Map(),windowListeners={};
 function element(id){return {id,style:{},dataset:{},listeners:{},attributes:{},textContent:'',value:'',open:false,
   addEventListener(type,fn){(this.listeners[type]??=[]).push(fn);},emit(type,event={}){for(const fn of this.listeners[type]||[])fn({currentTarget:this,...event});},
   setAttribute(k,v){this.attributes[k]=v;},focus(){document.activeElement=this;},showModal(){this.open=true;},close(){this.open=false;this.emit('close');},
   getBoundingClientRect(){return {left:0,top:0,width:1200,height:800};},
   set innerHTML(value){this.html=value;for(const m of value.matchAll(/id="([^"]+)"/g))elements.set(m[1],element(m[1]));},get innerHTML(){return this.html||'';}};}
 for(const m of html.matchAll(/id="([^"]+)"/g))elements.set(m[1],element(m[1]));
-for(const m of html.matchAll(/data-action="([^"]+)"/g)){const b=element(m[1]);b.dataset.action=m[1];nav.push(b);}
 function canvas(){const el=element('canvas');el.width=512;el.height=512;const ctx={fillRect(){},strokeRect(){},beginPath(){},moveTo(){},lineTo(){},bezierCurveTo(){},stroke(){},fillText(){},measureText(text){return {width:text.length*42};},
   // Synthetic strokes exercise mesh extrusion, not Thai font rendering.
   getImageData(x,y,w,h){const data=new Uint8ClampedArray(w*h*4);for(let yy=35;yy<85;yy++)for(let xx=8;xx<w-8;xx++)if(xx%34<18)data[(yy*w+xx)*4+3]=255;return {data};}};el.getContext=()=>ctx;return el;}
-const document={activeElement:null,body:{appendChild(){},classList:{add(){},remove(){}}},querySelector(selector){return elements.get(selector.slice(1));},querySelectorAll(){return nav;},createElement:()=>canvas()};
-const context=vm.createContext({console,document,innerWidth:1200,innerHeight:800,devicePixelRatio:1,Uint8Array,Uint8ClampedArray,ArrayBuffer,TextDecoder,TextEncoder,Blob,URL,performance,setTimeout,clearTimeout,queueMicrotask,atob,addEventListener(){},matchMedia:()=>({matches:false})});context.window=context;context.self=context;
+const document={activeElement:null,body:{appendChild(){},classList:{add(){},remove(){}}},querySelector(selector){return elements.get(selector.slice(1));},createElement:()=>canvas()};
+const context=vm.createContext({console,document,innerWidth:1200,innerHeight:800,devicePixelRatio:1,Uint8Array,Uint8ClampedArray,ArrayBuffer,TextDecoder,TextEncoder,Blob,URL,performance,setTimeout,clearTimeout,queueMicrotask,atob,addEventListener(type,fn){(windowListeners[type]??=[]).push(fn);},matchMedia:()=>({matches:false})});context.window=context;context.self=context;
 vm.runInContext(read('vendor/three.min.js'),context);
 const T=context.THREE;
 T.TextureLoader.prototype.load=function(url,onLoad){const tex=new T.Texture();tex.image={width:1,height:1};queueMicrotask(()=>onLoad?.(tex));return tex;};
@@ -26,6 +25,7 @@ T.OrbitControls=class{constructor(camera){this.camera=camera;this.target=new T.V
 for(const file of ['portrait-data.js','projects-data.js','garage-progress.js','garage-props.js','garage-final.js','viewer.js'])vm.runInContext(read(file),context,{filename:file});
 (async()=>{
   const debug=context.GARAGE_DEBUG;
+  assert(!html.includes('<aside class="panel"'));assert(!html.includes('id="light-toggle"'));assert(!html.includes('data-action='));
   assert(!html.includes('src="barry-data.js"'));assert(!html.includes('src="mclaren-data.js"'));assert(!html.includes('data-action="car"'));assert(!html.includes('data-action="barry"'));assert(!html.includes('data-action="equipment"'));
   const room=debug.garage.room;room.updateMatrixWorld(true);
   const bounds=new T.Box3().setFromObject(room),size=bounds.getSize(new T.Vector3());assert(size.x<=10&&size.z<=10,'Within assignment footprint');
@@ -46,9 +46,9 @@ for(const file of ['portrait-data.js','projects-data.js','garage-progress.js','g
   const toonMaterial=extinguisher.getObjectByName('Extinguisher body').material;assert(toonMaterial.isMeshToonMaterial);assert.equal(toonMaterial.gradientMap.magFilter,T.NearestFilter);assert.equal(toonMaterial.gradientMap.image.data.length,4);
   const lightSwitch=room.getObjectByName('Wall light switch');assert.equal(lightSwitch.userData.action,'light');
   assert(room.getObjectByName('Back ceiling light'));assert(room.getObjectByName('Switch rocker'));
-  const lightButton=elements.get('light-toggle');assert.equal(lightButton.attributes['aria-pressed'],undefined);
-  lightButton.emit('click');assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,0);assert.equal(debug.garage.accent.emissiveIntensity,0);assert.equal(debug.garage.switchIndicator.material.emissiveIntensity,0);assert.equal(lightButton.attributes['aria-pressed'],'false');
-  lightButton.emit('click');assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,1.7);assert.equal(lightButton.attributes['aria-pressed'],'true');
+  const pressKey=key=>{for(const listener of windowListeners.keydown||[])listener({key});};
+  pressKey('l');assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,0);assert.equal(debug.garage.accent.emissiveIntensity,0);assert.equal(debug.garage.switchIndicator.material.emissiveIntensity,0);
+  pressKey('l');assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,1.7);
   assert(!debug.scene.children.some(o=>o.isSprite));assert(!read('viewer.js').includes('new THREE.Sprite'));
   const flag=room.getObjectByName('GPU-deformed cloth');assert.equal(flag.geometry.attributes.position.count,41*25);assert(flag.material.vertexShader.includes('p.z+='));
   debug.renderer.frame();const before=debug.garage.shaderUniforms.uTime.value;debug.renderer.frame();assert(debug.garage.shaderUniforms.uTime.value>=before);
@@ -68,13 +68,13 @@ for(const file of ['portrait-data.js','projects-data.js','garage-progress.js','g
   const surface=debug.renderer.domElement;
   surface.emit('pointerdown',{button:0,pointerId:1,clientX:600,clientY:400});surface.emit('pointerup',{pointerId:1,clientX:600,clientY:400});
   assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,0);assert(!dialog.open,'Switch toggles directly without an info dialog');
-  lightButton.emit('click');assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,1.7);
+  pressKey('l');assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,1.7);
   debug.camera.position.set(-2.5,2.76,-1);debug.camera.lookAt(new T.Vector3(-3.48,2.76,-1));debug.camera.updateMatrixWorld(true);room.updateMatrixWorld(true);
   // Re-use the flag-facing camera to verify click, drag rejection and cancellation.
   surface.emit('pointerdown',{button:0,pointerId:1,clientX:600,clientY:400});surface.emit('pointerup',{pointerId:1,clientX:600,clientY:400});assert(dialog.open);assert.equal(elements.get('detail-title').textContent,'ปรับแรงลมของธง');dialog.close();
   surface.emit('pointerdown',{button:0,pointerId:1,clientX:600,clientY:400});surface.emit('pointerup',{pointerId:1,clientX:630,clientY:400});assert(!dialog.open,'Dragging must not open a modal');
   surface.emit('pointerdown',{button:0,pointerId:1,clientX:600,clientY:400});surface.emit('pointercancel');surface.emit('pointerup',{pointerId:1,clientX:600,clientY:400});assert(!dialog.open);
   debug.home();debug.renderer.frame();
-  for(const button of nav){button.emit('click');assert(dialog.open);dialog.close();}
+  for(const key of ['1','2','3']){pressKey(key);assert(dialog.open);dialog.close();}
   console.log(JSON.stringify({result:'PASS',importedModels:0,footprint:[size.x,size.z],textMeshes:text.length,picking:picks,shelfChildren:shelf.children.length,limitations:'DOM, canvas glyph raster, image decoding and GPU rendering mocked; visual QA and shader compile still require a real browser.'},null,2));
 })().catch(error=>{console.error(error);process.exitCode=1;});
