@@ -23,11 +23,10 @@ T.WebGLRenderer=class{constructor(){this.domElement=canvas();this.shadowMap={};}
 T.CubeCamera.prototype.update=function(){};
 T.PMREMGenerator=class{fromCubemap(){return {texture:new T.Texture()};}dispose(){}};
 T.OrbitControls=class{constructor(camera){this.camera=camera;this.target=new T.Vector3();this.enabled=true;}update(){this.camera.lookAt(this.target);this.camera.updateMatrixWorld(true);}};
-for(const file of ['vendor/GLTFLoader.js','portrait-data.js','barry-data.js','mclaren-data.js','projects-data.js','garage-progress.js','garage-final.js','viewer.js'])vm.runInContext(read(file),context,{filename:file});
+for(const file of ['portrait-data.js','projects-data.js','garage-progress.js','garage-final.js','viewer.js'])vm.runInContext(read(file),context,{filename:file});
 (async()=>{
   const debug=context.GARAGE_DEBUG;
-  for(let i=0;i<200&&debug.getLoaded()<2;i++)await new Promise(resolve=>setImmediate(resolve));
-  assert.equal(debug.getLoaded(),2,'Both real embedded GLBs parse');
+  assert(!html.includes('src="barry-data.js"'));assert(!html.includes('src="mclaren-data.js"'));assert(!html.includes('data-action="car"'));assert(!html.includes('data-action="barry"'));
   const room=debug.garage.room;room.updateMatrixWorld(true);
   const bounds=new T.Box3().setFromObject(room),size=bounds.getSize(new T.Vector3());assert(size.x<=10&&size.z<=10,'Within assignment footprint');
   const shelf=room.getObjectByName('Open tool shelf');assert.equal(shelf.children.length,6,'Shelf only posts and boards');
@@ -37,20 +36,21 @@ for(const file of ['vendor/GLTFLoader.js','portrait-data.js','barry-data.js','mc
   assert.equal(room.getObjectByName('Student portrait texture').material.map.encoding,T.sRGBEncoding);
   assert.equal(room.getObjectByName('Floor 8x8').material.color.getHex(),0x444e59);
   assert(!room.getObjectByName('Original cel-shaded garage robot'));assert(!room.getObjectByName('Robot body'));
-  assert.equal(debug.garage.gradientMap.magFilter,T.NearestFilter);assert(!html.includes('id="labels"'));assert(!html.includes('data-action="cel"'));
+  assert(!room.getObjectByName('McLaren F1 GTR Longtail'));assert(!room.getObjectByName('Barry Burton'));assert(!html.includes('id="labels"'));assert(!html.includes('data-action="cel"'));
+  room.traverse(o=>assert(!['car','barry'].includes(o.userData.action)));
+  assert(room.getObjectByName('Floor 8x8').material.isMeshStandardMaterial);
   assert(!debug.scene.children.some(o=>o.isSprite));assert(!read('viewer.js').includes('new THREE.Sprite'));
   const flag=room.getObjectByName('GPU-deformed cloth');assert.equal(flag.geometry.attributes.position.count,41*25);assert(flag.material.vertexShader.includes('p.z+='));
   debug.renderer.frame();const before=debug.garage.shaderUniforms.uTime.value;debug.renderer.frame();assert(debug.garage.shaderUniforms.uTime.value>=before);
   const dialog=elements.get('detail');
-  for(const action of ['profile','projects','car','barry','shader']){debug.showDetail(action);assert(dialog.open);assert(elements.get('detail-title').textContent);assert.equal(debug.controls.enabled,false);dialog.close();assert.equal(debug.controls.enabled,true);}
+  for(const action of ['profile','projects','shader']){debug.showDetail(action);assert(dialog.open);assert(elements.get('detail-title').textContent);assert.equal(debug.controls.enabled,false);dialog.close();assert.equal(debug.controls.enabled,true);}
   debug.showDetail('projects');const projectHTML=elements.get('detail-body').innerHTML;
   const expectedURLs=['https://www.desmos.com/calculator/ii0ryabjgz','https://russiasg1234-del.github.io/sia/paint-assignment/','https://russiasg1234-del.github.io/sia/character-pbr/'];
   assert.equal(context.PORTFOLIO_PROJECTS.length,3);assert.equal((projectHTML.match(/class="project-card"/g)||[]).length,3);
   for(const url of expectedURLs)assert(projectHTML.includes('href="'+url+'"'));
   assert.equal((projectHTML.match(/rel="noopener noreferrer"/g)||[]).length,3);assert(!projectHTML.includes('รอรูป'));dialog.close();
-  debug.showDetail('barry');elements.get('barry-style').emit('click');let toonMeshes=0;debug.models.barry.traverse(o=>{if(o.isMesh){toonMeshes++;assert(o.material.isMeshToonMaterial);}});assert(toonMeshes>0);elements.get('barry-style').emit('click');debug.models.barry.traverse(o=>{if(o.isMesh)assert(!o.material.isMeshToonMaterial);});dialog.close();
   debug.showDetail('shader');elements.get('amplitude').value='0.20';elements.get('amplitude').emit('input');assert.equal(debug.garage.shaderUniforms.uAmplitude.value,.2);elements.get('motion-toggle').emit('click');const paused=debug.garage.shaderUniforms.uTime.value;debug.renderer.frame();assert.equal(debug.garage.shaderUniforms.uTime.value,paused);elements.get('motion-toggle').emit('click');dialog.close();
-  const targets=[['profile',[-1.54,2.19,-3.735],[-1.54,2.19,-1]],['projects',[2.5,1.59,-2.71],[2.5,1.59,-1.8]],['car',[-.95,.48,.1],[-.95,3,3.3]],['barry',[1.4,.95,1.6],[1.4,.95,3.3]],['shader',[-3.48,2.76,-1],[-2.5,2.76,-1]]];
+  const targets=[['profile',[-1.54,2.19,-3.735],[-1.54,2.19,-1]],['projects',[2.5,1.59,-2.71],[2.5,1.59,-1.8]],['shader',[-3.48,2.76,-1],[-2.5,2.76,-1]]];
   const picks=[];
   for(const [action,target,eye]of targets){debug.camera.position.set(...eye);debug.camera.lookAt(new T.Vector3(...target));debug.camera.updateMatrixWorld(true);room.updateMatrixWorld(true);const picked=debug.pick({clientX:600,clientY:400});assert.equal(picked?.userData.action,action,`Raycast ${action}`);picks.push(action);}
   // Re-use the flag-facing camera to verify click, drag rejection and cancellation.
@@ -60,5 +60,5 @@ for(const file of ['vendor/GLTFLoader.js','portrait-data.js','barry-data.js','mc
   surface.emit('pointerdown',{button:0,pointerId:1,clientX:600,clientY:400});surface.emit('pointercancel');surface.emit('pointerup',{pointerId:1,clientX:600,clientY:400});assert(!dialog.open);
   debug.home();debug.renderer.frame();
   for(const button of nav){button.emit('click');assert(dialog.open);dialog.close();}
-  console.log(JSON.stringify({result:'PASS',models:debug.getLoaded(),footprint:[size.x,size.z],textMeshes:text.length,picking:picks,shelfChildren:shelf.children.length,limitations:'DOM, canvas glyph raster, image decoding and GPU rendering mocked; visual QA and shader compile still require a real browser.'},null,2));
+  console.log(JSON.stringify({result:'PASS',importedModels:0,footprint:[size.x,size.z],textMeshes:text.length,picking:picks,shelfChildren:shelf.children.length,limitations:'DOM, canvas glyph raster, image decoding and GPU rendering mocked; visual QA and shader compile still require a real browser.'},null,2));
 })().catch(error=>{console.error(error);process.exitCode=1;});

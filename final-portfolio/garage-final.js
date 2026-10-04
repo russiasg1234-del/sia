@@ -80,9 +80,6 @@ function createDarkGarage(THREE) {
   box(rails,'Workbench light strip',[1.8,.02,.025],[2.63,.956,-2.04],accent);
   for(const x of [-3.55,3.55])box(rails,'Front marker light',[.025,1.5,.026],[x,1.15,3.48],accent);
 
-  // Retain the quantized lighting ramp for Barry's optional cel-shaded material.
-  const ramp=new THREE.DataTexture(new Uint8Array([48,108,180,255]),4,1,THREE.LuminanceFormat);
-  ramp.minFilter=ramp.magFilter=THREE.NearestFilter;ramp.generateMipmaps=false;ramp.needsUpdate=true;
 
   // GPU animation displaces vertices every frame, with the top edge anchored.
   const shaderUniforms={uTime:{value:0},uAmplitude:{value:.12}};
@@ -93,5 +90,5 @@ function createDarkGarage(THREE) {
   const flag=group('Vertex shader cloth','shader','ธงโรงรถ / Vertex shader');
   mesh(flag,'GPU-deformed cloth',new THREE.PlaneGeometry(1.1,.65,40,24),clothMat,[-3.48,2.76,-1.0]).rotation.y=Math.PI/2;
   box(flag,'Cloth mounting bar',[.035,.045,1.18],[-3.48,3.105,-1],steel);
-  return {room,shaderUniforms,gradientMap:ramp};
+  return {room,shaderUniforms};
 }
