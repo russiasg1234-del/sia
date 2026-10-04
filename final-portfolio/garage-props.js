@@ -1,7 +1,6 @@
 /* Simple student-style workshop props, built from primitives without downloads. */
 function createGarageProps(THREE){
   const props=new THREE.Group();props.name='Simple garage equipment';
-  props.userData={action:'equipment',label:'อุปกรณ์โรงรถ / สร้างจากทรงพื้นฐาน'};
   const rubber=new THREE.MeshStandardMaterial({color:0x25282c,roughness:.95,metalness:0});
   const metal=new THREE.MeshStandardMaterial({color:0x78818b,roughness:.4,metalness:.8});
   const red=new THREE.MeshStandardMaterial({color:0x854338,roughness:.65,metalness:.25});

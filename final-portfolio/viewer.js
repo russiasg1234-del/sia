@@ -15,7 +15,7 @@
   const reflectionTarget=new THREE.WebGLCubeRenderTarget(128,{generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter});
   const reflectionCamera=new THREE.CubeCamera(.1,40,reflectionTarget);reflectionCamera.position.set(.5,1.8,.3);reflectionCamera.update(renderer,scene);
   const pmrem=new THREE.PMREMGenerator(renderer),environment=pmrem.fromCubemap(reflectionTarget.texture);scene.environment=environment.texture;pmrem.dispose();reflectionTarget.dispose();
-  status.textContent='พร้อมสำรวจ · คลิกวัตถุเพื่อดูข้อมูล';
+  status.textContent='พร้อมสำรวจ · คลิกกรอบรูป จอ หรือธง';
   const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=2.4;controls.maxDistance=24;controls.maxPolarAngle=Math.PI/2-.02;
   function home(){camera.position.set(9.5,7.3,11.5);controls.target.set(0,1,.1);controls.update();}
   home();$('#home').addEventListener('click',home);
@@ -24,10 +24,9 @@
   const escapeHTML=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const projectsHTML='<p class="project-intro">ผลงานด้านกราฟิก 2D, โปรแกรมวาดภาพ และการแสดงโมเดล 3D</p>'+(window.PORTFOLIO_PROJECTS||[]).map((project,index)=>'<article class="project-card"><div class="project-top"><span class="project-number">0'+(index+1)+'</span><span class="project-category">'+escapeHTML(project.category)+'</span></div><h3>'+escapeHTML(project.title)+'</h3><p>'+escapeHTML(project.description)+'</p><div class="project-tools">'+escapeHTML(project.tools)+'</div><a class="project-link" href="'+escapeHTML(project.url)+'" target="_blank" rel="noopener noreferrer" aria-label="เปิดผลงาน '+escapeHTML(project.title)+' ในแท็บใหม่">เปิดผลงาน ↗</a></article>').join('')+'<p class="project-note">เปิดผลงานในแท็บใหม่ ต้องเชื่อมต่ออินเทอร์เน็ตเพื่อดูเว็บไซต์ปลายทาง</p>';
   const content={
-    equipment:{kicker:'04 / SIMPLE WORKSHOP PROPS',title:'อุปกรณ์โรงรถ',html:'<p>ของใช้โรงรถแบบเรียบง่าย: ยางอะไหล่ กรวยจราจร แม่แรง แผ่นนอนซ่อมรถ ถังดับเพลิง และนาฬิกาผนัง</p><p>ประกอบเองจากกล่อง ทรงกระบอก วงแหวนและท่อใน Three.js ไม่ได้ดาวน์โหลดโมเดลสำเร็จรูป ชั้นวางยังโล่ง และไม่มีรถ ตัวละคร หรือตู้เครื่องมือ</p><p class="material-tag">PBR: ยาง โลหะ และผิวอุปกรณ์<br>Cel shading: กรวยสีส้ม / แถบขาว</p><p>กรวยใช้ MeshToonMaterial กับ gradient map 4 ระดับแบบ NearestFilter ให้แสงเป็นแถบสี แทนการใช้ตัวละคร</p>'},
-    profile:{kicker:'01 / ABOUT ME',title:'สิทธิศักดิ์ บุษบก',html:'<img class="portrait" id="profile-image" alt="รูปโปรไฟล์ของสิทธิศักดิ์"><p>Sittisak Busabuk<br>Computer Science Student</p><div class="dialog-clear"></div><dl><dt>รหัสนักศึกษา</dt><dd>6621650469</dd><dt>สาขา</dt><dd>วิทยาการคอมพิวเตอร์</dd><dt>คณะ</dt><dd>ศิลปศาสตร์และวิทยาศาสตร์</dd><dt>มหาวิทยาลัย</dt><dd>มหาวิทยาลัยเกษตรศาสตร์</dd></dl><p>ชื่อ รหัส สาขา คณะ และมหาวิทยาลัยบนผนังสร้างเป็น geometry 3D มีความหนาและเงา รูปถ่ายเป็น texture ในฉาก</p>'},
+    profile:{kicker:'01 / ABOUT ME',title:'สิทธิศักดิ์ บุษบก',html:'<img class="portrait" id="profile-image" alt="รูปโปรไฟล์ของสิทธิศักดิ์"><p>Sittisak Busabuk<br>Computer Science Student</p><div class="dialog-clear"></div><dl><dt>รหัสนักศึกษา</dt><dd>6621650469</dd><dt>สาขา</dt><dd>วิทยาการคอมพิวเตอร์</dd><dt>คณะ</dt><dd>ศิลปศาสตร์และวิทยาศาสตร์</dd><dt>มหาวิทยาลัย</dt><dd>มหาวิทยาลัยเกษตรศาสตร์</dd></dl>'},
     projects:{kicker:'02 / SELECTED WORK',title:'Portfolio / 3 Projects',html:projectsHTML},
-    shader:{kicker:'03 / REAL-TIME VERTEX SHADER',title:'Garage Signal',html:'<p>ธงลายกราฟิกบนผนังซ้ายเป็นระนาบแบ่งย่อย 40 × 24 ช่อง vertex shader ขยับตำแหน่ง vertex ด้วยเวลาแบบ realtime โดยตรึงขอบบนไว้กับคาน</p><div class="settings"><button id="motion-toggle">หยุดการเคลื่อนไหว</button><label for="amplitude">แรงลม <output id="amplitude-value">0.12</output></label><input id="amplitude" type="range" min="0" max="0.20" step="0.01" value="0.12"></div>'}
+    shader:{kicker:'03 / REAL-TIME VERTEX SHADER',title:'ปรับแรงลมของธง',html:'<div class="settings"><button id="motion-toggle">หยุดการเคลื่อนไหว</button><label for="amplitude">แรงลม <output id="amplitude-value">0.12</output></label><input id="amplitude" type="range" min="0" max="0.20" step="0.01" value="0.12"></div>'}
   };
   function showDetail(action){
     const item=content[action];if(!item)return;

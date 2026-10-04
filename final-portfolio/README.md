@@ -13,7 +13,7 @@
 - PBR: คอนกรีต/ผนัง roughness และ bump, เหล็ก metalness พร้อม environment ยังคงอยู่
 - Cel shading: กรวยจราจรสีส้มและแถบขาวใช้ MeshToonMaterial กับ gradient map 4 ระดับแบบ NearestFilter ไม่จำเป็นต้องมีรถหรือตัวละคร
 - Vertex shader: ธง grid 40 × 24 ขยับ vertex ตาม uniform เวลา มีขอบบนตรึงและปรับแรงลม/หยุดได้ รองรับ prefers-reduced-motion
-- Picking: Raycaster บน mesh จริง — โปรไฟล์, จอ, ธง, กลุ่มอุปกรณ์โรงรถ; มีเมนูคีย์บอร์ดสำรอง แยกคลิก/ลากกล้อง
+- Picking: Raycaster บน mesh จริง — โปรไฟล์, จอ และธง; อุปกรณ์โรงรถเป็นของตกแต่ง ไม่เปิดคำอธิบาย มีเมนูคีย์บอร์ดสำรอง แยกคลิก/ลากกล้อง
 - ผลงานจริงครบ 3 ลิงก์ที่ผู้ใช้ส่ง: Electrode (Desmos), My Paint (Assignment 2), Barry Burton (Character PBR) คลิกจอคอม/เมนูผลงานเพื่อเปิดการ์ดและลิงก์ในแท็บใหม่
 
 ## ไฟล์
@@ -32,4 +32,4 @@ McLaren โดย vecarz ใช้ CC BY-NC-SA 4.0 งานการศึก�
 
 รัน `node tests/final.test.cjs` เพื่อตรวจไฟล์/geometry/material/picking/interaction และยืนยันว่าไม่มีโมเดลรถ/คนในฉากปัจจุบัน แบบ headless โดยใช้ Three จริงและ mock เฉพาะ canvas raster/DOM/GPU/texture image decoding การทดสอบนี้ไม่ใช่การยืนยันภาพหรือ shader compile ในเบราว์เซอร์จริง
 
-ก่อนส่ง เปิดเว็บจริงตรวจแสง ความคมชัดภาษาไทย รูป texture, cel shading บนกรวย และการคลิกโปรไฟล์/จอ/ธง/อุปกรณ์บน desktop/mobile ดู `checklist.html` ไฟล์โมเดลเดิมยังเก็บไว้สำหรับเวอร์ชันสำรอง ไม่ได้ลบทิ้ง
+ก่อนส่ง เปิดเว็บจริงตรวจแสง ความคมชัดภาษาไทย รูป texture, cel shading บนกรวย และการคลิกโปรไฟล์/จอ/ธงบน desktop/mobile ดู `checklist.html` ไฟล์โมเดลเดิมยังเก็บไว้สำหรับเวอร์ชันสำรอง ไม่ได้ลบทิ้ง
