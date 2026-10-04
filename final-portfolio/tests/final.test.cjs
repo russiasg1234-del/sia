@@ -41,8 +41,14 @@ for(const file of ['portrait-data.js','projects-data.js','garage-progress.js','g
   assert(room.getObjectByName('Floor 8x8').material.isMeshStandardMaterial);
   for(const name of ['Stacked spare tires','Basic floor jack','Mechanic creeper','Fire extinguisher','Simple wall clock'])assert(room.getObjectByName(name),name);
   assert(!room.getObjectByName('Simple garage equipment').userData.action,'Garage props are decorative, not a detail popup');
-  const cone=room.getObjectByName('Cel-shaded traffic cone 1');assert(cone);
-  const coneMaterial=cone.getObjectByName('Cone orange lower').material;assert(coneMaterial.isMeshToonMaterial);assert.equal(coneMaterial.gradientMap.magFilter,T.NearestFilter);assert.equal(coneMaterial.gradientMap.image.data.length,4);
+  assert(!room.getObjectByName('Cel-shaded traffic cone 1'));assert(!room.getObjectByName('Cel-shaded traffic cone 2'));
+  const extinguisher=room.getObjectByName('Fire extinguisher');
+  const toonMaterial=extinguisher.getObjectByName('Extinguisher body').material;assert(toonMaterial.isMeshToonMaterial);assert.equal(toonMaterial.gradientMap.magFilter,T.NearestFilter);assert.equal(toonMaterial.gradientMap.image.data.length,4);
+  const lightSwitch=room.getObjectByName('Wall light switch');assert.equal(lightSwitch.userData.action,'light');
+  assert(room.getObjectByName('Back ceiling light'));assert(room.getObjectByName('Switch rocker'));
+  const lightButton=elements.get('light-toggle');assert.equal(lightButton.attributes['aria-pressed'],undefined);
+  lightButton.emit('click');assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,0);assert.equal(debug.garage.accent.emissiveIntensity,0);assert.equal(debug.garage.switchIndicator.material.emissiveIntensity,0);assert.equal(lightButton.attributes['aria-pressed'],'false');
+  lightButton.emit('click');assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,1.7);assert.equal(lightButton.attributes['aria-pressed'],'true');
   assert(!debug.scene.children.some(o=>o.isSprite));assert(!read('viewer.js').includes('new THREE.Sprite'));
   const flag=room.getObjectByName('GPU-deformed cloth');assert.equal(flag.geometry.attributes.position.count,41*25);assert(flag.material.vertexShader.includes('p.z+='));
   debug.renderer.frame();const before=debug.garage.shaderUniforms.uTime.value;debug.renderer.frame();assert(debug.garage.shaderUniforms.uTime.value>=before);
@@ -57,8 +63,14 @@ for(const file of ['portrait-data.js','projects-data.js','garage-progress.js','g
   const targets=[['profile',[-1.54,2.19,-3.735],[-1.54,2.19,-1]],['projects',[2.5,1.59,-2.71],[2.5,1.59,-1.8]],['shader',[-3.48,2.76,-1],[-2.5,2.76,-1]]];
   const picks=[];
   for(const [action,target,eye]of targets){debug.camera.position.set(...eye);debug.camera.lookAt(new T.Vector3(...target));debug.camera.updateMatrixWorld(true);room.updateMatrixWorld(true);const picked=debug.pick({clientX:600,clientY:400});assert.equal(picked?.userData.action,action,`Raycast ${action}`);picks.push(action);}
-  // Re-use the flag-facing camera to verify click, drag rejection and cancellation.
+  debug.camera.position.set(-2.7,1.4,1.75);debug.camera.lookAt(new T.Vector3(-3.76,1.4,1.75));debug.camera.updateMatrixWorld(true);room.updateMatrixWorld(true);
+  assert.equal(debug.pick({clientX:600,clientY:400})?.userData.action,'light','Wall switch is pickable');
   const surface=debug.renderer.domElement;
+  surface.emit('pointerdown',{button:0,pointerId:1,clientX:600,clientY:400});surface.emit('pointerup',{pointerId:1,clientX:600,clientY:400});
+  assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,0);assert(!dialog.open,'Switch toggles directly without an info dialog');
+  lightButton.emit('click');assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,1.7);
+  debug.camera.position.set(-2.5,2.76,-1);debug.camera.lookAt(new T.Vector3(-3.48,2.76,-1));debug.camera.updateMatrixWorld(true);room.updateMatrixWorld(true);
+  // Re-use the flag-facing camera to verify click, drag rejection and cancellation.
   surface.emit('pointerdown',{button:0,pointerId:1,clientX:600,clientY:400});surface.emit('pointerup',{pointerId:1,clientX:600,clientY:400});assert(dialog.open);assert.equal(elements.get('detail-title').textContent,'ปรับแรงลมของธง');dialog.close();
   surface.emit('pointerdown',{button:0,pointerId:1,clientX:600,clientY:400});surface.emit('pointerup',{pointerId:1,clientX:630,clientY:400});assert(!dialog.open,'Dragging must not open a modal');
   surface.emit('pointerdown',{button:0,pointerId:1,clientX:600,clientY:400});surface.emit('pointercancel');surface.emit('pointerup',{pointerId:1,clientX:600,clientY:400});assert(!dialog.open);

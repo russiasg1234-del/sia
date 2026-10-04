@@ -18,18 +18,10 @@ function createGarageProps(THREE){
     for(let j=0;j<12;j++){const a=j*Math.PI/6;const tread=box(tires,'Tire tread',[.07,.1,.025],[Math.sin(a)*.413,.12+i*.23,Math.cos(a)*.413],rubber);tread.rotation.y=a;}
   }
 
-  // Real stepped-light cel shading fulfils the rubric without a character.
+  // Keep a cel-shaded workshop prop after removing the traffic cones.
   const ramp=new THREE.DataTexture(new Uint8Array([48,106,174,255]),4,1,THREE.LuminanceFormat);
   ramp.minFilter=ramp.magFilter=THREE.NearestFilter;ramp.generateMipmaps=false;ramp.needsUpdate=true;
-  const orangeToon=new THREE.MeshToonMaterial({color:0xc16b35,gradientMap:ramp});
-  const whiteToon=new THREE.MeshToonMaterial({color:0xd8d7cf,gradientMap:ramp});
-  for(let i=0;i<2;i++){
-    const cone=group('Cel-shaded traffic cone '+(i+1),[-2.7+i*.85,0,2.55]);
-    box(cone,'Cone rubber base',[.59,.07,.59],[0,.035,0],rubber);
-    cylinder(cone,'Cone orange lower',.16,.24,.24,[0,.19,0],orangeToon);
-    cylinder(cone,'Cone white stripe',.12,.16,.12,[0,.37,0],whiteToon);
-    cylinder(cone,'Cone orange tip',.025,.12,.2,[0,.53,0],orangeToon);
-  }
+  const redToon=new THREE.MeshToonMaterial({color:0xb94c3f,gradientMap:ramp});
 
   const jack=group('Basic floor jack',[-.65,0,.75]);jack.rotation.y=-.25;
   box(jack,'Jack base',[.44,.13,1.1],[0,.17,0],red);
@@ -46,8 +38,8 @@ function createGarageProps(THREE){
   for(const x of [-.34,.34])for(const z of [-.55,.55])cylinder(creeper,'Creeper wheel',.09,.09,.07,[x,.09,z],rubber).rotation.z=Math.PI/2;
 
   const extinguisher=group('Fire extinguisher',[3.12,0,2.65]);
-  cylinder(extinguisher,'Extinguisher body',.12,.12,.48,[0,.3,0],red);
-  cylinder(extinguisher,'Extinguisher shoulder',.055,.12,.09,[0,.585,0],red);
+  cylinder(extinguisher,'Extinguisher body',.12,.12,.48,[0,.3,0],redToon);
+  cylinder(extinguisher,'Extinguisher shoulder',.055,.12,.09,[0,.585,0],redToon);
   cylinder(extinguisher,'Extinguisher valve',.025,.025,.08,[0,.67,0],metal);
   box(extinguisher,'Extinguisher handle',[.16,.035,.04],[.015,.72,0],rubber);
   box(extinguisher,'Extinguisher label',[.14,.19,.01],[0,.34,.122],white);

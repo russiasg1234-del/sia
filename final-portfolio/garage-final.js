@@ -79,6 +79,15 @@ function createDarkGarage(THREE) {
   box(rails,'Back light strip',[7.2,.028,.026],[0,3.25,-3.8],accent);
   box(rails,'Workbench light strip',[1.8,.02,.025],[2.63,.956,-2.04],accent);
   for(const x of [-3.55,3.55])box(rails,'Front marker light',[.025,1.5,.026],[x,1.15,3.48],accent);
+  const ceilingLamp=find('Back ceiling light');
+  const lightSwitch=group('Wall light switch','light','สวิตช์ไฟโรงรถ / คลิกเพื่อปิด');
+  lightSwitch.position.set(-3.76,1.4,1.75);
+  const switchPlate=new THREE.MeshStandardMaterial({color:0x87939d,roughness:.68,metalness:.25});
+  const switchRocker=new THREE.MeshStandardMaterial({color:0x283640,roughness:.62});
+  const switchLED=new THREE.MeshStandardMaterial({color:0x90e7f2,emissive:0x66d5e5,emissiveIntensity:2});
+  box(lightSwitch,'Switch plate',[.055,.34,.25],[0,0,0],switchPlate);
+  const switchLever=box(lightSwitch,'Switch rocker',[.075,.14,.13],[.064,.035,0],switchRocker);
+  const switchIndicator=mesh(lightSwitch,'Switch indicator',new THREE.SphereGeometry(.022,10,8),switchLED,[.055,.125,0]);
   room.add(createGarageProps(THREE));
 
 
@@ -91,5 +100,5 @@ function createDarkGarage(THREE) {
   const flag=group('Vertex shader cloth','shader','ธงโรงรถ / Vertex shader');
   mesh(flag,'GPU-deformed cloth',new THREE.PlaneGeometry(1.1,.65,40,24),clothMat,[-3.48,2.76,-1.0]).rotation.y=Math.PI/2;
   box(flag,'Cloth mounting bar',[.035,.045,1.18],[-3.48,3.105,-1],steel);
-  return {room,shaderUniforms};
+  return {room,shaderUniforms,ceilingLamp,accent,switchLever,switchIndicator,lightSwitch};
 }
