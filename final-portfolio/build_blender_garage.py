@@ -233,6 +233,13 @@ flag = cube("Vertex shader flag - web animation", (-3.48, -1.0, 2.76),
             (.018, 1.1, .65), cyan, info, 0)
 flag["web_shader"] = "See garage-shaders.js for real-time vertex animation; this Blender mesh is static."
 
+# Blender's Y axis maps to the opposite web Z axis during glTF export. Mirror
+# the editable source layout in X so the presentation camera sees the same
+# left/right arrangement as the final web camera after a 180-degree Y rotation.
+for col in (shell, bench, shelf, props, info):
+    for obj in col.objects:
+        obj.location.x = -obj.location.x
+
 
 light("Main ceiling area light", (.2, -2.0, 3.2), 620, (.68, .88, 1.0), 4.0)
 light("Front fill", (2.0, 4.0, 5.0), 900, (1.0, 1.0, 1.0), 5.0)
@@ -240,7 +247,7 @@ light("Cyan rim", (-3.0, -1.0, 2.8), 420, (.28, .70, 1.0), 2.5)
 camera_data = bpy.data.cameras.new("Presentation camera")
 camera = bpy.data.objects.new("Presentation camera", camera_data)
 lights.objects.link(camera)
-camera.location = (10.5, 12.5, 9.2)
+camera.location = (-10.5, 12.5, 9.2)
 camera.rotation_euler = (Vector((0, 0, 1.45)) - camera.location).to_track_quat("-Z", "Y").to_euler()
 camera_data.type = "ORTHO"
 camera_data.ortho_scale = 13.5

@@ -29,7 +29,7 @@
     if(oldParking)garage.room.remove(oldParking);
     const importedArchitecture=gltf.scene;
     importedArchitecture.name='Architecture imported from Blender GLB';
-    importedArchitecture.scale.z=-1; // Blender +Y was the garage's front.
+    importedArchitecture.rotation.y=Math.PI; // Match Blender's front and left/right orientation.
     importedArchitecture.traverse(object=>{if(object.isMesh){
       object.castShadow=true;object.receiveShadow=true;
       const materials=Array.isArray(object.material)?object.material:[object.material];
