@@ -235,7 +235,8 @@ flag["web_shader"] = "See garage-shaders.js for real-time vertex animation; this
 
 # Blender's Y axis maps to the opposite web Z axis during glTF export. Mirror
 # the editable source layout in X so the presentation camera sees the same
-# left/right arrangement as the final web camera after a 180-degree Y rotation.
+# left/right arrangement as the web camera. The export restores the website's
+# original X coordinates without modifying the saved Blender presentation.
 for col in (shell, bench, shelf, props, info):
     for obj in col.objects:
         obj.location.x = -obj.location.x
@@ -275,14 +276,19 @@ bpy.ops.object.select_all(action="DESELECT")
 bpy.context.view_layer.objects.active = None
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT))
 bpy.ops.render.render(write_still=True)
-# Export the architecture from native Blender meshes. The HTML embeds these
-# exact GLB bytes to work from file:// without a server.
+# Export the architecture in the website's original coordinates. This happens
+# after saving/rendering the mirrored Blender presentation scene, so the .blend
+# matches the website visually without changing any website positioning code.
 bpy.ops.object.select_all(action="DESELECT")
 for obj in shell.objects:
     if obj.type == "MESH" and obj.name not in {"Ceiling light housing", "Ceiling light diffuser"}:
+        obj.location.x = -obj.location.x
         obj.select_set(True)
 bpy.context.view_layer.objects.active = next(obj for obj in shell.objects if obj.select_get())
 bpy.ops.export_scene.gltf(filepath=str(WEB_GLB), export_format="GLB", use_selection=True)
+for obj in shell.objects:
+    if obj.select_get():
+        obj.location.x = -obj.location.x
 WEB_DATA.write_text(
     "window.GARAGE_ARCHITECTURE_BASE64='"
     + base64.b64encode(WEB_GLB.read_bytes()).decode("ascii") + "';\n",
