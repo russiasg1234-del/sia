@@ -4,7 +4,7 @@
 
 ## ฉาก
 
-โรงรถ 8 × 8 หน่วย โทนถ่านและเทาเข้ม มีแสง cyan, shadow map, ACES tone mapping และ environment reflection สร้างโรงรถ โต๊ะ ชั้นวาง และธงเองด้วย geometry ชั้นวางยังโล่งและไม่มีตู้เครื่องมือ รถ McLaren, Barry, Robot และระบบแสดงป้ายลอยถูกนำออกตามคำขอ ไม่โหลดไฟล์ GLB ในหน้าฉากปัจจุบัน
+โรงรถ 8 × 8 หน่วย โทนถ่านและเทาเข้ม มีแสง cyan, shadow map, ACES tone mapping และ environment reflection ส่วนอาคารปั้นเป็นวัตถุแก้ไขได้ใน `dark-garage-model.blend` แล้วส่งออกเป็น `assets/dark-garage-architecture.glb` ซึ่งหน้าเว็บโหลดจริง โต๊ะ ชั้นวาง อุปกรณ์ โปรไฟล์ สวิตช์ และธงในเว็บยังสร้างด้วย Three.js ชั้นวางโล่ง ไม่มีรถ ตัวละคร หรือตู้เครื่องมือ
 
 ## เกณฑ์ Final
 
@@ -12,7 +12,7 @@
 - รูปที่ผู้ใช้ส่งอยู่ใน `portrait-data.js` เป็น texture ของกรอบรูปในฉาก
 - PBR: คอนกรีต/ผนัง roughness และ bump, เหล็ก metalness พร้อม environment ยังคงอยู่
 - Cel shading: ถังดับเพลิงใช้ MeshToonMaterial กับ gradient map 4 ระดับแบบ NearestFilter ไม่จำเป็นต้องมีรถหรือตัวละคร
-- Vertex shader: ธง grid 40 × 24 ขยับ vertex ตาม uniform เวลา มีขอบบนตรึงและปรับแรงลม/หยุดได้ รองรับ prefers-reduced-motion
+- Vertex shader: เปิด `garage-shaders.js` เพื่อดูโค้ด Vertex/Fragment Shader แบบอ่านได้ ธง grid 40 × 24 ขยับ vertex ตาม uniform เวลา มีขอบบนตรึงและปรับแรงลม/หยุดได้ รองรับ prefers-reduced-motion
 - Picking: Raycaster บน mesh จริง — โปรไฟล์, จอ, ธง และสวิตช์ไฟ; อุปกรณ์อื่นเป็นของตกแต่ง แยกคลิก/ลากกล้อง เอาแผงเมนูด้านซ้ายออกแล้ว ใช้คีย์ 1/2/3 เปิดข้อมูล และ L เปิด–ปิดไฟได้
 - ผลงานจริงครบ 3 ลิงก์ที่ผู้ใช้ส่ง: Electrode (Desmos), My Paint (Assignment 2), Barry Burton (Character PBR) คลิกจอคอมหรือกดคีย์ 2 เพื่อเปิดการ์ดและลิงก์ในแท็บใหม่
 
@@ -22,11 +22,11 @@
 
 `garage-props.js` เพิ่มของแบบง่ายที่สร้างเองจากทรงพื้นฐาน: ยางซ้อน 3 เส้น แม่แรง แผ่นนอนซ่อมรถ ถังดับเพลิง และนาฬิกา ไม่โหลดโมเดลคนอื่น ไม่เพิ่มของบนชั้น ไม่เพิ่มรถ/ตัวละคร/ตู้เครื่องมือ
 
+`dark-garage-model.blend` เป็นไฟล์ Blender ที่เปิดแก้ไขโมเดลโรงรถได้ มี 121 objects จัดเป็น collections ตามส่วนต่าง ๆ สคริปต์ `build_blender_garage.py` สร้างไฟล์นี้และส่งออกส่วนอาคารเป็น GLB จาก Blender จริง หน้าเว็บอ่าน GLB bytes ที่ฝังใน `garage-model-data.js` เพื่อให้เปิดแบบ `file://` ได้โดยไม่ต้องรัน server เมื่อโหลดเสร็จจะนำอาคาร procedural เดิมออกและแทนด้วยโมเดล GLB ส่วนอื่นของเว็บยังเป็น Three.js ไม่ควรกล่าวว่าทั้งเว็บไซต์ส่งออกจาก Blender
+
 `projects-data.js` เก็บชื่อ คำอธิบาย เครื่องมือ และลิงก์ของผลงานทั้งสาม การเปิดฉากในเครื่องไม่ต้องใช้อินเทอร์เน็ต แต่ลิงก์ผลงานไปเว็บไซต์จริงต้องเชื่อมต่ออินเทอร์เน็ต
 
-`index-progress.html` + `viewer-progress.js` เก็บเวอร์ชันก่อนหน้าไว้เปิดดูได้ ไม่ได้ลบงานเดิม
-
-McLaren โดย vecarz ใช้ CC BY-NC-SA 4.0 งานการศึกษาไม่แสวงหากำไรเท่านั้น ดู `credits.html` และ `assets/MCLAREN-LICENSE.md`
+ไฟล์ตัวอย่างเวอร์ชันเก่าและโมเดลรถ/ตัวละครที่ไม่ได้ใช้ใน Final ถูกนำออกจากโฟลเดอร์ส่งงานแล้ว
 
 ## ทดสอบ
 

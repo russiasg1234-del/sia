@@ -3,6 +3,9 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),asse
 const root=path.resolve(__dirname,'..'),read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const html=read('index.html');
 for(const match of html.matchAll(/(?:src|href)="([^"#]+)"/g)){if(!/^(https?:|data:)/.test(match[1]))assert(fs.existsSync(path.join(root,match[1])),match[1]);}
+const glb=fs.readFileSync(path.join(root,'assets/dark-garage-architecture.glb'));
+const embedded=read('garage-model-data.js').match(/GARAGE_ARCHITECTURE_BASE64='([^']+)'/)[1];
+assert(Buffer.from(embedded,'base64').equals(glb),'Embedded model must match the Blender GLB file');
 const elements=new Map(),windowListeners={};
 function element(id){return {id,style:{},dataset:{},listeners:{},attributes:{},textContent:'',value:'',open:false,
   addEventListener(type,fn){(this.listeners[type]??=[]).push(fn);},emit(type,event={}){for(const fn of this.listeners[type]||[])fn({currentTarget:this,...event});},
@@ -16,14 +19,16 @@ function canvas(){const el=element('canvas');el.width=512;el.height=512;const ct
 const document={activeElement:null,body:{appendChild(){},classList:{add(){},remove(){}}},querySelector(selector){return elements.get(selector.slice(1));},createElement:()=>canvas()};
 const context=vm.createContext({console,document,innerWidth:1200,innerHeight:800,devicePixelRatio:1,Uint8Array,Uint8ClampedArray,ArrayBuffer,TextDecoder,TextEncoder,Blob,URL,performance,setTimeout,clearTimeout,queueMicrotask,atob,addEventListener(type,fn){(windowListeners[type]??=[]).push(fn);},matchMedia:()=>({matches:false})});context.window=context;context.self=context;
 vm.runInContext(read('vendor/three.min.js'),context);
+vm.runInContext(read('vendor/GLTFLoader.js'),context);
 const T=context.THREE;
 T.TextureLoader.prototype.load=function(url,onLoad){const tex=new T.Texture();tex.image={width:1,height:1};queueMicrotask(()=>onLoad?.(tex));return tex;};
 T.WebGLRenderer=class{constructor(){this.domElement=canvas();this.shadowMap={};}setPixelRatio(){}setSize(){}setAnimationLoop(fn){this.frame=fn;}render(scene,camera){scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);}};
 T.CubeCamera.prototype.update=function(){};
 T.PMREMGenerator=class{fromCubemap(){return {texture:new T.Texture()};}dispose(){}};
 T.OrbitControls=class{constructor(camera){this.camera=camera;this.target=new T.Vector3();this.enabled=true;}update(){this.camera.lookAt(this.target);this.camera.updateMatrixWorld(true);}};
-for(const file of ['portrait-data.js','projects-data.js','garage-progress.js','garage-props.js','garage-final.js','viewer.js'])vm.runInContext(read(file),context,{filename:file});
+for(const file of ['portrait-data.js','projects-data.js','garage-model-data.js','garage-progress.js','garage-props.js','garage-shaders.js','garage-final.js','viewer.js'])vm.runInContext(read(file),context,{filename:file});
 (async()=>{
+  await new Promise(resolve=>setTimeout(resolve,0));
   const debug=context.GARAGE_DEBUG;
   assert(!html.includes('<aside class="panel"'));assert(!html.includes('id="light-toggle"'));assert(!html.includes('data-action='));
   assert(!html.includes('src="barry-data.js"'));assert(!html.includes('src="mclaren-data.js"'));assert(!html.includes('data-action="car"'));assert(!html.includes('data-action="barry"'));assert(!html.includes('data-action="equipment"'));
@@ -34,11 +39,12 @@ for(const file of ['portrait-data.js','projects-data.js','garage-progress.js','g
   const text=[];room.traverse(o=>{if(o.name.startsWith('3D text:'))text.push(o);if(o.isMesh){assert(o.geometry.attributes.position);for(const v of o.geometry.attributes.position.array)assert(Number.isFinite(v));}});
   assert.equal(text.length,5);for(const mesh of text){assert(mesh.geometry.attributes.position.count>100);assert(mesh.geometry.boundingBox.max.z-mesh.geometry.boundingBox.min.z>.02);}
   assert.equal(room.getObjectByName('Student portrait texture').material.map.encoding,T.sRGBEncoding);
-  assert.equal(room.getObjectByName('Floor 8x8').material.color.getHex(),0x444e59);
+  assert(room.getObjectByName('Architecture imported from Blender GLB'));
   assert(!room.getObjectByName('Original cel-shaded garage robot'));assert(!room.getObjectByName('Robot body'));
   assert(!room.getObjectByName('McLaren F1 GTR Longtail'));assert(!room.getObjectByName('Barry Burton'));assert(!html.includes('id="labels"'));assert(!html.includes('data-action="cel"'));
   room.traverse(o=>assert(!['car','barry'].includes(o.userData.action)));
-  assert(room.getObjectByName('Floor 8x8').material.isMeshStandardMaterial);
+  assert(room.getObjectByName('Floor_8_x_8_units')?.material?.isMeshStandardMaterial,
+    'GLB floor missing; imported names: '+room.getObjectByName('Architecture imported from Blender GLB').children.map(o=>o.name).join(', '));
   for(const name of ['Stacked spare tires','Basic floor jack','Mechanic creeper','Fire extinguisher','Simple wall clock'])assert(room.getObjectByName(name),name);
   assert(!room.getObjectByName('Simple garage equipment').userData.action,'Garage props are decorative, not a detail popup');
   assert(!room.getObjectByName('Cel-shaded traffic cone 1'));assert(!room.getObjectByName('Cel-shaded traffic cone 2'));
@@ -50,7 +56,7 @@ for(const file of ['portrait-data.js','projects-data.js','garage-progress.js','g
   pressKey('l');assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,0);assert.equal(debug.garage.accent.emissiveIntensity,0);assert.equal(debug.garage.switchIndicator.material.emissiveIntensity,0);
   pressKey('l');assert.equal(debug.garage.ceilingLamp.material.emissiveIntensity,1.7);
   assert(!debug.scene.children.some(o=>o.isSprite));assert(!read('viewer.js').includes('new THREE.Sprite'));
-  const flag=room.getObjectByName('GPU-deformed cloth');assert.equal(flag.geometry.attributes.position.count,41*25);assert(flag.material.vertexShader.includes('p.z+='));
+  const flag=room.getObjectByName('GPU-deformed cloth');assert.equal(flag.geometry.attributes.position.count,41*25);assert(/p\.z\s*\+=/.test(flag.material.vertexShader));
   debug.renderer.frame();const before=debug.garage.shaderUniforms.uTime.value;debug.renderer.frame();assert(debug.garage.shaderUniforms.uTime.value>=before);
   const dialog=elements.get('detail');
   for(const action of ['profile','projects','shader']){debug.showDetail(action);assert(dialog.open);assert(elements.get('detail-title').textContent);assert.equal(debug.controls.enabled,false);dialog.close();assert.equal(debug.controls.enabled,true);}
@@ -76,5 +82,5 @@ for(const file of ['portrait-data.js','projects-data.js','garage-progress.js','g
   surface.emit('pointerdown',{button:0,pointerId:1,clientX:600,clientY:400});surface.emit('pointercancel');surface.emit('pointerup',{pointerId:1,clientX:600,clientY:400});assert(!dialog.open);
   debug.home();debug.renderer.frame();
   for(const key of ['1','2','3']){pressKey(key);assert(dialog.open);dialog.close();}
-  console.log(JSON.stringify({result:'PASS',importedModels:0,footprint:[size.x,size.z],textMeshes:text.length,picking:picks,shelfChildren:shelf.children.length,limitations:'DOM, canvas glyph raster, image decoding and GPU rendering mocked; visual QA and shader compile still require a real browser.'},null,2));
+  console.log(JSON.stringify({result:'PASS',importedModels:1,footprint:[size.x,size.z],textMeshes:text.length,picking:picks,shelfChildren:shelf.children.length,limitations:'DOM, canvas glyph raster, image decoding and GPU rendering mocked; visual QA and shader compile still require a real browser.'},null,2));
 })().catch(error=>{console.error(error);process.exitCode=1;});

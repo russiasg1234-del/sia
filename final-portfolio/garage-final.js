@@ -94,8 +94,8 @@ function createDarkGarage(THREE) {
   // GPU animation displaces vertices every frame, with the top edge anchored.
   const shaderUniforms={uTime:{value:0},uAmplitude:{value:.12}};
   const clothMat=new THREE.ShaderMaterial({uniforms:shaderUniforms,side:THREE.DoubleSide,
-    vertexShader:'uniform float uTime; uniform float uAmplitude; varying vec2 vUv; varying float vWave; void main(){vUv=uv;vec3 p=position;float anchor=pow(1.0-uv.y,1.5);float wave=sin(p.x*7.0-uTime*2.2)+0.45*sin(p.y*10.0+uTime*1.7);p.z+=wave*uAmplitude*anchor;p.x+=sin(uTime*1.3+p.y*5.0)*uAmplitude*0.2*anchor;vWave=wave;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);}',
-    fragmentShader:'varying vec2 vUv; varying float vWave; void main(){float edge=step(0.035,vUv.x)*step(vUv.x,0.965)*step(0.045,vUv.y)*step(vUv.y,0.955);float stripe=step(0.12,mod(vUv.x*7.0+vUv.y*3.0,1.0));vec3 dark=vec3(0.06,0.10,0.15);vec3 cyan=vec3(0.27,0.7,0.78);vec3 col=mix(cyan,mix(dark,cyan*0.8,stripe*0.22),edge);col*=0.88+0.12*vWave;gl_FragColor=vec4(col,1.0);}'
+    vertexShader:window.GARAGE_SHADERS.vertex,
+    fragmentShader:window.GARAGE_SHADERS.fragment
   });
   const flag=group('Vertex shader cloth','shader','ธงโรงรถ / Vertex shader');
   mesh(flag,'GPU-deformed cloth',new THREE.PlaneGeometry(1.1,.65,40,24),clothMat,[-3.48,2.76,-1.0]).rotation.y=Math.PI/2;

@@ -12,6 +12,31 @@
   const workLight=new THREE.PointLight(0xc8f2ff,3.5,9,2);workLight.position.set(.15,3.15,-2.98);scene.add(workLight);
   const rim=new THREE.PointLight(0xa3c5ff,2,9,2);rim.position.set(-2,3,-1.5);scene.add(rim);
   const garage=createDarkGarage(THREE);scene.add(garage.room);
+  // Replace the procedural architectural shell with meshes exported from
+  // dark-garage-model.blend. The GLB is embedded for direct file:// opening.
+  const architectureBytes=atob(window.GARAGE_ARCHITECTURE_BASE64);
+  const architectureBuffer=new Uint8Array(architectureBytes.length);
+  for(let i=0;i<architectureBytes.length;i++)architectureBuffer[i]=architectureBytes.charCodeAt(i);
+  new THREE.GLTFLoader().parse(architectureBuffer.buffer,'',gltf=>{
+    const oldShell=garage.room.getObjectByName('Garage architecture');
+    const lampHousing=oldShell.getObjectByName('Back ceiling light housing');
+    const sign=oldShell.getObjectByName('Garage sign');
+    garage.room.attach(lampHousing);
+    garage.room.attach(garage.ceilingLamp);
+    garage.room.attach(sign);
+    garage.room.remove(oldShell);
+    const oldParking=garage.room.getObjectByName('Parking markings');
+    if(oldParking)garage.room.remove(oldParking);
+    const importedArchitecture=gltf.scene;
+    importedArchitecture.name='Architecture imported from Blender GLB';
+    importedArchitecture.scale.z=-1; // Blender +Y was the garage's front.
+    importedArchitecture.traverse(object=>{if(object.isMesh){
+      object.castShadow=true;object.receiveShadow=true;
+      const materials=Array.isArray(object.material)?object.material:[object.material];
+      materials.forEach(material=>{if(material.color)material.color.multiplyScalar(.48);});
+    }});
+    garage.room.add(importedArchitecture);
+  },error=>{console.error('Blender garage GLB could not load',error);status.textContent='โหลด GLB โรงรถไม่สำเร็จ';});
   const reflectionTarget=new THREE.WebGLCubeRenderTarget(128,{generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter});
   const reflectionCamera=new THREE.CubeCamera(.1,40,reflectionTarget);reflectionCamera.position.set(.5,1.8,.3);reflectionCamera.update(renderer,scene);
   const pmrem=new THREE.PMREMGenerator(renderer),environment=pmrem.fromCubemap(reflectionTarget.texture);scene.environment=environment.texture;pmrem.dispose();reflectionTarget.dispose();
